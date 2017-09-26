@@ -99,7 +99,7 @@ def main():
 
     flow_sequence = 1
 
-    gen_send_pkt('tmpl', flow_sequence=flow_sequence)
+    gen_send_pkt('tmpl', flow_sequence=flow_sequence, sport=PORT_SRC, dport=PORT_DST)
 
     while TIME_INTERVAL is not 0:
         if signal_received == 1:
@@ -112,12 +112,12 @@ def main():
             print "\nPackets count[%s] reached. Stopping and Exitting..." % PKT_COUNT
             sys.exit(0)
         if flow_sequence % 100 == 0:
-            gen_send_pkt('tmpl', flow_sequence=flow_sequence)
+            gen_send_pkt('tmpl', flow_sequence=flow_sequence, sport=PORT_SRC, dport=PORT_DST)
             continue
-        gen_send_pkt('data', flow_sequence)
+        gen_send_pkt('data', flow_sequence, sport=PORT_SRC, dport=PORT_DST)
 
 
-def gen_send_pkt(pkt_type='data', flow_sequence=1):
+def gen_send_pkt(pkt_type='data', flow_sequence=1, sport=2056, dport=2055):
     timestamp = int(time.time())
     if pkt_type == 'tmpl':
         pkt_netflow_tmpl = gen_pkt_netflow_tmpl(timestamp=timestamp, flow_sequence=flow_sequence)
@@ -125,7 +125,8 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1):
         send(pkt_netflow_tmpl)
     elif pkt_type == 'data':
         sys_uptime = 3600 * 1000
-        pkt_netflow_data = gen_pkt_netflow_data(timestamp=timestamp, sys_uptime=sys_uptime, flow_sequence=flow_sequence)
+        pkt_netflow_data = gen_pkt_netflow_data(timestamp=timestamp, sys_uptime=sys_uptime, flow_sequence=flow_sequence,
+                                                sport=sport, dport=dport)
         wrpcap('v9_test_data.pcap', pkt_netflow_data)
         send(pkt_netflow_data)
 
