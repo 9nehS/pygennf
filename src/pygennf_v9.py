@@ -124,15 +124,17 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
         pkt_netflow_tmpl = gen_pkt_netflow_tmpl(timestamp=timestamp, flow_sequence=flow_sequence,
                                                 src_ip=src_ip, dst_ip =dst_ip, sport=sport, dport=dport)
         wrpcap('v9_test_tmpl.pcap', pkt_netflow_tmpl)
-        sys.stdout.write("Sending packet: %d" % (flow_sequence))
+        sys.stdout.write("Sending packet: %d\n" % (flow_sequence))
         send(pkt_netflow_tmpl, verbose=0)
+        sys.stdout.flush()
     elif pkt_type == 'data':
         sys_uptime = 3600 * 1000
         pkt_netflow_data = gen_pkt_netflow_data(timestamp=timestamp, sys_uptime=sys_uptime, flow_sequence=flow_sequence,
                                                 src_ip=src_ip, dst_ip=dst_ip, sport=sport, dport=dport)
         wrpcap('v9_test_data.pcap', pkt_netflow_data)
-        sys.stdout.write("Sending packet: %d" % (flow_sequence))
+        sys.stdout.write("Sending packet: %d\n" % (flow_sequence))
         send(pkt_netflow_data, verbose=0)
+        sys.stdout.flush()
 
 
 def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=3600000, src_ip='121.41.5.67', dst_ip='121.41.5.68', sport=2056, dport=2055):
@@ -184,14 +186,16 @@ def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=36000
     len_netflow = calc_netflow_len(header_v9, flowset_flow_header_v9, flows)
     pad_len = 0
     pad = None
-    print 'len_netflow:', len_netflow
+    #print 'len_netflow:', len_netflow
+    sys.stdout.write("len_netflow: %d\n" % (len_netflow))
     len_after_padding = 0
 
     # Padding to make sure that FlowSet starts at a 4-byte aligned boundary -- rfc3954.txt
     if len_netflow % 4 != 0:
         len_after_padding = ((len_netflow / 4) + 1) * 4
         pad_len = len_after_padding - len_netflow
-        print 'pad_len:', pad_len
+        #print 'pad_len:', pad_len
+        sys.stdout.write("pad_len: %d\n" % (pad_len))
     else:
         len_after_padding = len_netflow
 
