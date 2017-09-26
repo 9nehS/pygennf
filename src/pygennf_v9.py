@@ -124,13 +124,13 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
         pkt_netflow_tmpl = gen_pkt_netflow_tmpl(timestamp=timestamp, flow_sequence=flow_sequence,
                                                 src_ip=src_ip, dst_ip =dst_ip, sport=sport, dport=dport)
         wrpcap('v9_test_tmpl.pcap', pkt_netflow_tmpl)
-        send(pkt_netflow_tmpl)
+        send(pkt_netflow_tmpl, verbose=0)
     elif pkt_type == 'data':
         sys_uptime = 3600 * 1000
         pkt_netflow_data = gen_pkt_netflow_data(timestamp=timestamp, sys_uptime=sys_uptime, flow_sequence=flow_sequence,
                                                 src_ip=src_ip, dst_ip=dst_ip, sport=sport, dport=dport)
         wrpcap('v9_test_data.pcap', pkt_netflow_data)
-        send(pkt_netflow_data)
+        send(pkt_netflow_data, verbose=0)
 
 
 def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=3600000, src_ip='121.41.5.67', dst_ip='121.41.5.68', sport=2056, dport=2055):
