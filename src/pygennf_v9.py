@@ -40,6 +40,14 @@ def signal_handler(signal, frame):
 
 # Netflow9
 def main():
+
+    print "\n****************************"
+    print "* Flow Generator Ver. 0.11 *"
+    print "* Modified by Sheng Zhao   *"
+    print "* Calix Cloud SIT          *"
+    print "* sheng.zhao@calix.com     *"
+    print "****************************\n\n"
+
     if os.getuid() != 0:
         print "You need to be root to run this, sorry."
         return
