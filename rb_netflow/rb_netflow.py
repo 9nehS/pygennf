@@ -283,3 +283,40 @@ class Flow_v9(Packet):
 bind_layers( NetFlowTemplatev10Field,   NetFlowTemplatev10FieldPEN, version=5)
 #bind_layers( NetflowHeaderV5, NetflowRecordV5 )
 #bind_layers( NetflowRecordV5, NetflowRecordV5 )
+
+
+# FlowSet With Template ID 260
+
+class Flow_260_v9(Packet):
+    name = "Element flow (v9) for template id 260"
+    fields_desc = [
+        IntField('Packets', 1),
+        IntField('Octets', 1000),
+        IPField('SrcAddr', '11.11.11.11'),
+        IPField('DstAddr', '22.22.22.22'),
+        IntField('InputInt', 100),
+        IntField('OutputInt', 101),
+        IntField('EndTime', 3569615),
+        IntField('StartTime', 3569614),
+        ShortField("SrcPort", 8888),
+        ShortField("DstPort", 80),
+        IntField('SrcAS', 0),
+        IntField('DstAS', 0),
+        IPField('BGPNextHop', '0.0.0.0'),
+        ByteField("SrcMask", 24),
+        ByteField("DstMask", 24),
+        ByteField("Protocol", 6),
+        XByteField("TCPFlags", 0x10),
+        XByteField("IPToS", 0x00),
+        ByteField("Direction", 0),
+        XByteField("ForwardingStatus", 0x40),
+        ShortField("SamplerID", 2),
+        XIntField("IngressVRFID", 0x60000000),
+        XIntField("EgressVRFID", 0x60000000)
+    ]
+
+
+bind_layers( NetFlowTemplatev10Field,   NetFlowTemplatev10FieldPEN, version=5)
+#bind_layers( NetflowHeaderV5, NetflowRecordV5 )
+#bind_layers( NetflowRecordV5, NetflowRecordV5 )
+
