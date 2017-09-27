@@ -51,3 +51,7 @@ Netflow packets generator with Scapy library
 
  * Netflow 9:
 > pygennf_v9.py --source-ip 10.19.5.54 --dst-ip 10.19.5.118 --dst-port 2062 -t 1 -c 3600 -p tcp -b 1024
+>
+> ![2017-09-27_console_snapshot_01.png](https://github.com/9nehS/pygennf/blob/master/resources/2017-09-27_console_snapshot_01.png)
+>
+> ![2017-09-27_web_snapshot_01.png](https://github.com/9nehS/pygennf/blob/master/resources/2017-09-27_web_snapshot_01.png)
