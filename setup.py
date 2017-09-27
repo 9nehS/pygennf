@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(name="pygennf",
       version="0.11",
-      description="UDP packets producer with scapy",
+      description="Netflow packets generator with scapy",
       author="Sheng Zhao",
       author_email="sheng.zhao@calix.com",
       url="https://github.com/9nehS/",
