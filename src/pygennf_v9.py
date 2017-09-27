@@ -55,21 +55,21 @@ def main():
 
     parser = argparse.ArgumentParser(description='UDP packets producer with scapy')
     parser.add_argument('-s', '--source-ip', dest='src_ip',
-                        help='IP source')
+                        help='Source IP of netflow packet(s).')
     parser.add_argument('-sp', '--source-port', dest='src_port',
-                        help='Port dst')
+                        help='Source port of netflow packet(s).')
     parser.add_argument('-d', '--dst-ip', dest='dst_ip',
-                        help='IP source')
+                        help='Destination IP of netflow packet(s).')
     parser.add_argument('-dp', '--dst-port', dest='dst_port',
-                        help='Port dst')
+                        help='Destination port of netflow packet(s).')
     parser.add_argument('-t', '--time-interval', dest='time_interval',
-                        help='Time interval to wait to send other messages.')
+                        help='Time interval to wait before sending each netflow packet.')
     parser.add_argument('-c', '--pkt-count', dest='pkt_count',
-                        help='Packets count before producer stops.')
+                        help='Packets count to be sent before this generator stopping.')
     parser.add_argument('-p', '--protocol', dest='protocol',
-                        help='Protocols included in netflow data part.')
+                        help='Protocols included in netflow data part, e.g. tcp(6) or udp(17).')
     parser.add_argument('-b', '--bytes', dest='bytes',
-                        help='Bytes(octets) in single flow.')
+                        help='Bytes(octets) in single flow, e.g. 1024.')
 
     args = parser.parse_args()
 
