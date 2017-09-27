@@ -159,7 +159,7 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
     if pkt_type == 'tmpl':
         pkt_netflow_tmpl = gen_pkt_netflow_tmpl(timestamp=timestamp, flow_sequence=flow_sequence,
                                                 src_ip=src_ip, dst_ip =dst_ip, sport=sport, dport=dport)
-        wrpcap('v9_test_tmpl.pcap', pkt_netflow_tmpl)
+        #wrpcap('v9_test_tmpl.pcap', pkt_netflow_tmpl)
         sys.stdout.write("Sending packet: %d \r" % (flow_sequence))
         send(pkt_netflow_tmpl, verbose=0)
         sys.stdout.flush()
@@ -168,7 +168,7 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
         pkt_netflow_data = gen_pkt_netflow_data(timestamp=timestamp, sys_uptime=sys_uptime, flow_sequence=flow_sequence,
                                                 src_ip=src_ip, dst_ip=dst_ip, sport=sport, dport=dport,
                                                 protocol_num=protocol_num, octets=octets)
-        wrpcap('v9_test_data.pcap', pkt_netflow_data)
+        #wrpcap('v9_test_data.pcap', pkt_netflow_data)
         sys.stdout.write("Sending packet: %d \r" % (flow_sequence))
         send(pkt_netflow_data, verbose=0)
         sys.stdout.flush()
