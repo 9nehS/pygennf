@@ -7,42 +7,37 @@ Netflow packets generator with Scapy library
 >
 > python setup.py install
 
-# Usage (without installation):
+# Usage:
 
- * You need to install the scapy library:
- pip install scapy
+ * pygennf_v9.py --help
 
- * python ./pygennf_v5.py --help
-
-> usage: pygennf_v5.py [-h] [-s SRC_IP] [-sp SRC_PORT] [-d DST_IP]
->                      [-dp DST_PORT] [-t TIME_INTERVAL]
-> 
-> UDP packets producer with scapy
-> 
-> optional arguments:
+>usage: pygennf_v9.py [-h] [-s SRC_IP] [-sp SRC_PORT] [-d DST_IP]
+>                     [-dp DST_PORT] [-t TIME_INTERVAL] [-c PKT_COUNT]
+>                     [-p PROTOCOL] [-b BYTES]
+>
+>UDP packets producer with scapy
+>
+>optional arguments:
 >  -h, --help            show this help message and exit
-
 >  -s SRC_IP, --source-ip SRC_IP
->                        IP source
-
+>                        Source IP of netflow packet(s).
 >  -sp SRC_PORT, --source-port SRC_PORT
->                        Port dst
-
+>                        Source port of netflow packet(s).
 >  -d DST_IP, --dst-ip DST_IP
->                        IP source
-
+>                        Destination IP of netflow packet(s).
 >  -dp DST_PORT, --dst-port DST_PORT
->                        Port dst
-
+>                        Destination port of netflow packet(s).
 >  -t TIME_INTERVAL, --time-interval TIME_INTERVAL
-                        Time interval to wait to send other messages.
+>                        Time interval to wait before sending each netflow packet.
+>  -c PKT_COUNT, --pkt-count PKT_COUNT
+>                        Packets count to be sent before this generator stopping.
+>  -p PROTOCOL, --protocol PROTOCOL
+>                        Protocols included in netflow data part, e.g. tcp(6) or udp(17).
+>  -b BYTES, --bytes BYTES
+>                        Bytes(octets) in single flow, e.g. 1024.
+
 
 # Example of use:
 
- * Netflow 5:
-> sudo python src/pygennf_v5.py -s 10.0.203.2 -d 10.0.30.89 -t 2
  * Netflow 9:
-> sudo python src/pygennf_v9.py -s 10.0.203.2 -d 10.0.30.89 -t 2
- * Netflow 10:
-> sudo python src/pygennf_v10.py -s 10.0.203.2 -d 10.0.30.89 -t 2
-
+> pygennf_v9.py --source-ip 10.19.5.54 --dst-ip 10.19.5.118 --dst-port 2062 -t 1 -c 3600 -p tcp -b 1024
