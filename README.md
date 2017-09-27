@@ -12,9 +12,7 @@ Netflow packets generator with Scapy library
  * pygennf_v9.py --help
 
 >usage: pygennf_v9.py [-h] [-s SRC_IP] [-sp SRC_PORT] [-d DST_IP]
->
 >                     [-dp DST_PORT] [-t TIME_INTERVAL] [-c PKT_COUNT]
->
 >                     [-p PROTOCOL] [-b BYTES]
 >
 >UDP packets producer with scapy
