@@ -53,7 +53,7 @@ def main():
         print "You need to be root to run this, sorry."
         return
 
-    parser = argparse.ArgumentParser(description='UDP packets producer with scapy')
+    parser = argparse.ArgumentParser(description='Netflow packets generator with scapy')
     parser.add_argument('-s', '--source-ip', dest='src_ip',
                         help='Source IP of netflow packet(s).')
     parser.add_argument('-sp', '--source-port', dest='src_port',
