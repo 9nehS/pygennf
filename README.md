@@ -1,18 +1,10 @@
 # pygennf
 
-Netflow packets generator with Scape library
-
-* Download it! [https://github.com/redBorder/pygennf/tree/master/download]
-
- > rpm: (python2.6) wget https://github.com/redBorder/pygennf/raw/master/download/pygennf-0.1-1.noarch.rpm
- 
- > tar.gz: wget https://github.com/redBorder/pygennf/raw/master/download/pygennf-0.1.tar.gz
+Netflow packets generator with Scapy library
 
 * How to install:
-python setup.py install
-
-* How to install the rpm packege:
-rpm -vUh pygennf-0.1-1.noarch.rpm    
+> git clone https://github.com/9nehS/pygennf.git
+> python setup.py install
 
 # Usage (without installation):
 
