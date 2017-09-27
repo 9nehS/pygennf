@@ -28,6 +28,7 @@ import rb_netflow.rb_netflow as rbnf
 
 signal_received = 0
 
+dic_protocol_num = {'tcp': 6, 'udp': 17}
 
 def preexec():
     os.setpgrp()  # Don't forward signals
@@ -65,6 +66,8 @@ def main():
                         help='Time interval to wait to send other messages.')
     parser.add_argument('-c', '--pkt-count', dest='pkt_count',
                         help='Packets count before producer stops.')
+    parser.add_argument('-p', '--protocol', dest='protocol',
+                        help='Protocols included in netflow data part.')
 
     args = parser.parse_args()
 
@@ -102,6 +105,15 @@ def main():
         # 0xFFFFFFFF - 1
         PKT_COUNT = 4294967294
 
+    if args.protocol:
+        try:
+            PROTOCOL_NUM = dic_protocol_num[args.protocol]
+        except KeyError:
+            print "'%s' cannot be mapped to existing protocols, use TCP[6] as default" % (args.protocol)
+            PROTOCOL_NUM = 6
+    else:
+        PROTOCOL_NUM = 6    # TCP by default
+
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
@@ -121,12 +133,14 @@ def main():
             sys.exit(0)
         if flow_sequence % 100 == 0:
             gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST,
-                         sport=PORT_SRC, dport=PORT_DST)
+                         sport=PORT_SRC, dport=PORT_DST, protocol_num=PROTOCOL_NUM)
             continue
-        gen_send_pkt('data', flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST, sport=PORT_SRC, dport=PORT_DST)
+        gen_send_pkt('data', flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST, sport=PORT_SRC, dport=PORT_DST,
+                     protocol_num=PROTOCOL_NUM)
 
 
-def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2.2.2.2', sport=2056, dport=2055):
+def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2.2.2.2', sport=2056, dport=2055,
+                 protocol_num=6):
     timestamp = int(time.time())
     if pkt_type == 'tmpl':
         pkt_netflow_tmpl = gen_pkt_netflow_tmpl(timestamp=timestamp, flow_sequence=flow_sequence,
@@ -138,14 +152,16 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
     elif pkt_type == 'data':
         sys_uptime = 3600 * 1000
         pkt_netflow_data = gen_pkt_netflow_data(timestamp=timestamp, sys_uptime=sys_uptime, flow_sequence=flow_sequence,
-                                                src_ip=src_ip, dst_ip=dst_ip, sport=sport, dport=dport)
+                                                src_ip=src_ip, dst_ip=dst_ip, sport=sport, dport=dport,
+                                                protocol_num=protocol_num)
         wrpcap('v9_test_data.pcap', pkt_netflow_data)
         sys.stdout.write("Sending packet: %d \r" % (flow_sequence))
         send(pkt_netflow_data, verbose=0)
         sys.stdout.flush()
 
 
-def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=3600000, src_ip='121.41.5.67', dst_ip='121.41.5.68', sport=2056, dport=2055):
+def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=3600000, src_ip='121.41.5.67',
+                         dst_ip='121.41.5.68', sport=2056, dport=2055, protocol_num=6):
     header_v9 = rbnf.Netflow_Headerv9(version=9, count=1, SysUptime=0x000069d7, Timestamp=timestamp,
                                       FlowSequence=flow_sequence, SourceId=2177)
     flowset_flow_header_v9 = rbnf.FlowSet_Header_v9(FlowSet_id=260, FlowSet_length=72)
@@ -185,7 +201,7 @@ def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=36000
         flows.append(rbnf.Flow_260_v9(
             Packets=1, Octets=1024, SrcAddr=src_dst_addr[0], DstAddr=src_dst_addr[1], InputInt=145, OutputInt=142,
             EndTime=end_time, StartTime=start_time, SrcPort=src_dst_port_list[0][0], DstPort=src_dst_port_list[0][1],
-            SrcAS=0, DstAS=0, BGPNextHop='0.0.0.0', SrcMask=17, DstMask=28, Protocol=6, TCPFlags=0x10, IPToS=0x00,
+            SrcAS=0, DstAS=0, BGPNextHop='0.0.0.0', SrcMask=17, DstMask=28, Protocol=protocol_num, TCPFlags=0x10, IPToS=0x00,
             Direction=0, ForwardingStatus=0x40, SamplerID=2, IngressVRFID=0x60000000, EgressVRFID=0x60000000
         ))
 
@@ -232,7 +248,8 @@ def calc_netflow_len(header, flowset_flow_header, flows):
     return len_netflow
 
 
-def gen_pkt_netflow_tmpl(timestamp=1503652676, flow_sequence=1, source_id=2177, template_id=260, src_ip='121.41.5.67', dst_ip='121.41.5.68', sport=2056, dport=2055):
+def gen_pkt_netflow_tmpl(timestamp=1503652676, flow_sequence=1, source_id=2177, template_id=260, src_ip='121.41.5.67',
+                         dst_ip='121.41.5.68', sport=2056, dport=2055):
     header_v9 = rbnf.Netflow_Headerv9(version=9, count=1, SysUptime=0x000069d7, Timestamp=timestamp, FlowSequence=flow_sequence,SourceId=source_id)
     flowset_tmpl_header_v9 = rbnf.FlowSet_Header_v9(FlowSet_id=0, FlowSet_length=100)
     flowset_tmpl_data_header_v9 = rbnf.FlowTemplate_ID_v9(template_id=template_id,count=23)
