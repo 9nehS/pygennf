@@ -26,14 +26,14 @@ from scapy.all import *
 
 import rb_netflow.rb_netflow as rbnf
 
-signal_received = 0
+SIGNAL_RECEIVED = 0
 
 def preexec():
     os.setpgrp()  # Don't forward signals
 
 def signal_handler(signal, frame):
-    global signal_received
-    signal_received = 1
+    global SIGNAL_RECEIVED
+    SIGNAL_RECEIVED = 1
 
 def main():
     if os.getuid() != 0:
@@ -323,7 +323,7 @@ def main():
     send(data)
 
     while TIME_INTERVAL is not 0:
-        if signal_received == 1:
+        if SIGNAL_RECEIVED == 1:
             print "\nSignal received. Stopping and Exitting..."
             sys.exit(0)
         time.sleep(float(TIME_INTERVAL))
