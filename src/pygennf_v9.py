@@ -143,16 +143,13 @@ def main():
         BYTES = 1024
 
     if args.flows_data:
-        print 'args.flows_data: %s' % (args.flows_data)
         FLOW_DATA_LIST = args.flows_data.split(',')
-        print 'FLOW_DATA_LIST before pre-processing: '
-        print FLOW_DATA_LIST
         FLOW_DATA_LIST = map(str.strip, FLOW_DATA_LIST)
-        print 'FLOW_DATA_LIST after map:'
-        print FLOW_DATA_LIST
         FLOW_DATA_LIST = filter(valid_flow_data, FLOW_DATA_LIST)
-        print 'FLOW_DATA_LIST after filter: '
-        print FLOW_DATA_LIST
+        if len(FLOW_DATA_LIST) == 0:
+            print 'No valid flow data list, default flow data list will be used...'
+            print "Default flow data: %s" % (DEFAULT_FLOW_DATA)
+            FLOW_DATA_LIST.append(DEFAULT_FLOW_DATA)
     else:
         print "'args.flows_data' is empty, default flow data list will be used..."
         print "Default flow data: %s" % (DEFAULT_FLOW_DATA)
