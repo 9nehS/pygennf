@@ -247,8 +247,11 @@ def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=36000
     #         Direction=0, ForwardingStatus=0x40, SamplerID=2, IngressVRFID=0x60000000, EgressVRFID=0x60000000
     #     ))
 
+    print 'Flows to be sent:\n'
+
     # To process flow_data_list
     for flow_data in flow_data_list:
+        print flow_data
         data_item_list = flow_data.split(':')
         src_addr = data_item_list[0].split('/')[0]
         src_mask = int(data_item_list[0].split('/')[1])
