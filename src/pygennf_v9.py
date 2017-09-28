@@ -34,6 +34,7 @@ DIC_DIRECTION_NUM = {'ingress': 0, 'egress': 1}
 # ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes
 # e.g. 11.11.11.11/32:1001:11.11.11.22/32:1002:tcp:ingress:1024
 FLOW_DATA_PATTERN = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}:\d{1,4}:){2}\w+:(ingress|egress):\d{1,4}$'
+DEFAULT_FLOW_DATA = '11.11.11.11/32:1001:11.11.11.22/32:80:tcp:ingress:1024'
 
 def preexec():
     os.setpgrp()  # Don't forward signals
@@ -147,7 +148,10 @@ def main():
         FLOW_DATA_LIST = filter(valid_flow_data, FLOW_DATA_LIST)
         print FLOW_DATA_LIST
     else:
-        pass
+        print "'%s' is empty, default flow data list will be used: " % (args.flows_data)
+        print "Default flow data: %s" % (DEFAULT_FLOW_DATA)
+        FLOW_DATA_LIST = []
+        FLOW_DATA_LIST.append(DEFAULT_FLOW_DATA)
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -171,11 +175,11 @@ def main():
                          sport=PORT_SRC, dport=PORT_DST, protocol_num=PROTOCOL_NUM, octets=BYTES)
             continue
         gen_send_pkt('data', flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST, sport=PORT_SRC, dport=PORT_DST,
-                     protocol_num=PROTOCOL_NUM, octets=BYTES)
+                     protocol_num=PROTOCOL_NUM, octets=BYTES, flow_data_list=FLOW_DATA_LIST)
 
 
 def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2.2.2.2', sport=2056, dport=2055,
-                 protocol_num=6, octets=1024):
+                 protocol_num=6, octets=1024, flow_data_list=[]):
     timestamp = int(time.time())
     if pkt_type == 'tmpl':
         pkt_netflow_tmpl = gen_pkt_netflow_tmpl(timestamp=timestamp, flow_sequence=flow_sequence,
@@ -188,7 +192,7 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
         sys_uptime = 3600 * 1000
         pkt_netflow_data = gen_pkt_netflow_data(timestamp=timestamp, sys_uptime=sys_uptime, flow_sequence=flow_sequence,
                                                 src_ip=src_ip, dst_ip=dst_ip, sport=sport, dport=dport,
-                                                protocol_num=protocol_num, octets=octets)
+                                                protocol_num=protocol_num, octets=octets, flow_data_list=flow_data_list)
         #wrpcap('v9_test_data.pcap', pkt_netflow_data)
         sys.stdout.write("Sending packet: %d \r" % (flow_sequence))
         send(pkt_netflow_data, verbose=0)
@@ -196,48 +200,70 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
 
 
 def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=3600000, src_ip='121.41.5.67',
-                         dst_ip='121.41.5.68', sport=2056, dport=2055, protocol_num=6, octets=1024):
+                         dst_ip='121.41.5.68', sport=2056, dport=2055, protocol_num=6, octets=1024, flow_data_list=[]):
     header_v9 = rbnf.Netflow_Headerv9(version=9, count=1, SysUptime=0x000069d7, Timestamp=timestamp,
                                       FlowSequence=flow_sequence, SourceId=2177)
     flowset_flow_header_v9 = rbnf.FlowSet_Header_v9(FlowSet_id=260, FlowSet_length=72)
 
     # List for SrcAddr and DstAddr in netflow data
-    src_dst_addr_list = []
-    src_dst_addr_list.append(['69.31.102.10', '209.81.108.20'])
-    src_dst_addr_list.append(['70.32.103.11', '210.81.108.21'])
-    src_dst_addr_list.append(['70.32.103.12', '210.81.108.22'])
-    src_dst_addr_list.append(['70.32.103.13', '210.81.108.23'])
-    src_dst_addr_list.append(['70.32.103.14', '210.81.108.24'])
-    src_dst_addr_list.append(['70.32.103.15', '210.81.108.25'])
-    src_dst_addr_list.append(['70.32.103.16', '210.81.108.26'])
-    src_dst_addr_list.append(['70.32.103.17', '210.81.108.27'])
-    src_dst_addr_list.append(['70.32.103.18', '210.81.108.28'])
-    src_dst_addr_list.append(['70.32.103.19', '210.81.108.29'])
-    src_dst_addr_list.append(['70.32.103.20', '210.81.108.30'])
-    src_dst_addr_list.append(['70.32.103.21', '210.81.108.31'])
-    src_dst_addr_list.append(['70.32.103.22', '210.81.108.32'])
-    src_dst_addr_list.append(['70.32.103.23', '210.81.108.33'])
-    src_dst_addr_list.append(['70.32.103.24', '210.81.108.34'])
-    src_dst_addr_list.append(['70.32.103.25', '210.81.108.35'])
-    src_dst_addr_list.append(['70.32.103.26', '210.81.108.36'])
-    src_dst_addr_list.append(['70.32.103.27', '210.81.108.37'])
-    src_dst_addr_list.append(['70.32.103.28', '210.81.108.38'])
-    src_dst_addr_list.append(['70.32.103.29', '210.81.108.39'])
-    src_dst_addr_list.append(['70.32.103.30', '210.81.108.40'])
-    src_dst_port_list = []
-    src_dst_port_list.append([12345, 80])
+    # src_dst_addr_list = []
+    # src_dst_addr_list.append(['69.31.102.10', '209.81.108.20'])
+    # src_dst_addr_list.append(['70.32.103.11', '210.81.108.21'])
+    # src_dst_addr_list.append(['70.32.103.12', '210.81.108.22'])
+    # src_dst_addr_list.append(['70.32.103.13', '210.81.108.23'])
+    # src_dst_addr_list.append(['70.32.103.14', '210.81.108.24'])
+    # src_dst_addr_list.append(['70.32.103.15', '210.81.108.25'])
+    # src_dst_addr_list.append(['70.32.103.16', '210.81.108.26'])
+    # src_dst_addr_list.append(['70.32.103.17', '210.81.108.27'])
+    # src_dst_addr_list.append(['70.32.103.18', '210.81.108.28'])
+    # src_dst_addr_list.append(['70.32.103.19', '210.81.108.29'])
+    # src_dst_addr_list.append(['70.32.103.20', '210.81.108.30'])
+    # src_dst_addr_list.append(['70.32.103.21', '210.81.108.31'])
+    # src_dst_addr_list.append(['70.32.103.22', '210.81.108.32'])
+    # src_dst_addr_list.append(['70.32.103.23', '210.81.108.33'])
+    # src_dst_addr_list.append(['70.32.103.24', '210.81.108.34'])
+    # src_dst_addr_list.append(['70.32.103.25', '210.81.108.35'])
+    # src_dst_addr_list.append(['70.32.103.26', '210.81.108.36'])
+    # src_dst_addr_list.append(['70.32.103.27', '210.81.108.37'])
+    # src_dst_addr_list.append(['70.32.103.28', '210.81.108.38'])
+    # src_dst_addr_list.append(['70.32.103.29', '210.81.108.39'])
+    # src_dst_addr_list.append(['70.32.103.30', '210.81.108.40'])
+    # src_dst_port_list = []
+    # src_dst_port_list.append([12345, 80])
 
     # List for flows in one packet
     flows = []
-    for src_dst_addr in src_dst_addr_list:
-        #end_time = sys_uptime + 3600 * 1000
+    # for src_dst_addr in src_dst_addr_list:
+    #     #end_time = sys_uptime + 3600 * 1000
+    #     end_time = timestamp
+    #     start_time = end_time - 1000     # Duration 1s
+    #     flows.append(rbnf.Flow_260_v9(
+    #         Packets=1, Octets=octets, SrcAddr=src_dst_addr[0], DstAddr=src_dst_addr[1], InputInt=145, OutputInt=142,
+    #         EndTime=end_time, StartTime=start_time, SrcPort=src_dst_port_list[0][0], DstPort=src_dst_port_list[0][1],
+    #         SrcAS=0, DstAS=0, BGPNextHop='0.0.0.0', SrcMask=17, DstMask=28, Protocol=protocol_num, TCPFlags=0x10, IPToS=0x00,
+    #         Direction=0, ForwardingStatus=0x40, SamplerID=2, IngressVRFID=0x60000000, EgressVRFID=0x60000000
+    #     ))
+
+    # To process flow_data_list
+    for flow_data in flow_data_list:
+        data_item_list = flow_data.split(':')
+        src_addr = data_item_list[0].split('/')[0]
+        src_mask = int(data_item_list[0].split('/')[1])
+        src_port = int(data_item_list[1])
+        dst_addr = data_item_list[2].split('/')[0]
+        dst_mask = int(data_item_list[2].split('/')[1])
+        dst_port = int(data_item_list[3])
+        protocol_num = DIC_PROTOCOL_NUM[data_item_list[4]]
+        direction = DIC_DIRECTION_NUM[data_item_list[5]]
+        bytes = int(data_item_list[6])
         end_time = timestamp
-        start_time = end_time - 1000     # Duration 1s
+        start_time = end_time - 1000  # Duration 1s
         flows.append(rbnf.Flow_260_v9(
-            Packets=1, Octets=octets, SrcAddr=src_dst_addr[0], DstAddr=src_dst_addr[1], InputInt=145, OutputInt=142,
-            EndTime=end_time, StartTime=start_time, SrcPort=src_dst_port_list[0][0], DstPort=src_dst_port_list[0][1],
-            SrcAS=0, DstAS=0, BGPNextHop='0.0.0.0', SrcMask=17, DstMask=28, Protocol=protocol_num, TCPFlags=0x10, IPToS=0x00,
-            Direction=0, ForwardingStatus=0x40, SamplerID=2, IngressVRFID=0x60000000, EgressVRFID=0x60000000
+            Packets=1, Octets=bytes, SrcAddr=src_addr, DstAddr=dst_addr, InputInt=145, OutputInt=142,
+            EndTime=end_time, StartTime=start_time, SrcPort=src_port, DstPort=dst_port,
+            SrcAS=0, DstAS=0, BGPNextHop='0.0.0.0', SrcMask=src_mask, DstMask=dst_mask, Protocol=protocol_num,
+            TCPFlags=0x10, IPToS=0x00, Direction=direction, ForwardingStatus=0x40, SamplerID=2, IngressVRFID=0x60000000,
+            EgressVRFID=0x60000000
         ))
 
     # Calculate the length of netflow data before padding
