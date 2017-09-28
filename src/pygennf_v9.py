@@ -33,7 +33,7 @@ DIC_DIRECTION_NUM = {'ingress': 0, 'egress': 1}
 
 # ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes
 # e.g. 11.11.11.11/32:1001:11.11.11.22/32:1002:tcp:ingress:1024
-FLOW_DATA_PATTERN = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}:\d{1,4}:){2}\w+:(ingress|egress):\d{1,4}$'
+FLOW_DATA_PATTERN = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}:\d{1,5}:){2}\w+:(ingress|egress):\d{1,4}$'
 DEFAULT_FLOW_DATA = '11.11.11.11/32:1001:11.11.11.22/32:80:tcp:ingress:1024'
 
 def preexec():
