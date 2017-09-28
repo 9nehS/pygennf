@@ -198,7 +198,7 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
         sys_uptime = 3600 * 1000
         pkt_netflow_data = gen_pkt_netflow_data(timestamp=timestamp, sys_uptime=sys_uptime, flow_sequence=flow_sequence,
                                                 src_ip=src_ip, dst_ip=dst_ip, sport=sport, dport=dport,
-                                                protocol_num=protocol_num, octets=octets, flow_data_list=flow_data_list)
+                                                flow_data_list=flow_data_list)
         #wrpcap('v9_test_data.pcap', pkt_netflow_data)
         sys.stdout.write("Sending packets: %d \r" % (flow_sequence))
         send(pkt_netflow_data, verbose=0)
@@ -206,7 +206,7 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
 
 
 def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=3600000, src_ip='121.41.5.67',
-                         dst_ip='121.41.5.68', sport=2056, dport=2055, protocol_num=6, octets=1024, flow_data_list=[]):
+                         dst_ip='121.41.5.68', sport=2056, dport=2055, flow_data_list=[]):
     header_v9 = rbnf.Netflow_Headerv9(version=9, count=1, SysUptime=0x000069d7, Timestamp=timestamp,
                                       FlowSequence=flow_sequence, SourceId=2177)
     flowset_flow_header_v9 = rbnf.FlowSet_Header_v9(FlowSet_id=260, FlowSet_length=72)
