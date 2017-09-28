@@ -148,8 +148,10 @@ def main():
         print 'FLOW_DATA_LIST before pre-processing: '
         print FLOW_DATA_LIST
         FLOW_DATA_LIST = map(str.strip, FLOW_DATA_LIST)
+        print 'FLOW_DATA_LIST after map:'
+        print FLOW_DATA_LIST
         FLOW_DATA_LIST = filter(valid_flow_data, FLOW_DATA_LIST)
-        print 'FLOW_DATA_LIST after pre-processing: '
+        print 'FLOW_DATA_LIST after filter: '
         print FLOW_DATA_LIST
     else:
         print "'args.flows_data' is empty, default flow data list will be used..."
