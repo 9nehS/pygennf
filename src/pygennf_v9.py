@@ -143,7 +143,7 @@ def main():
         BYTES = 1024
 
     if args.flows_data:
-        print 'args.flows_data: ' % args.flows_data
+        print 'args.flows_data: %s' % (args.flows_data)
         FLOW_DATA_LIST = args.flows_data.split(',')
         print 'FLOW_DATA_LIST before pre-processing: ' % FLOW_DATA_LIST
         FLOW_DATA_LIST = map(str.strip, FLOW_DATA_LIST)
