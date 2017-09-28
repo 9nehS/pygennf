@@ -148,7 +148,7 @@ def main():
         FLOW_DATA_LIST = filter(valid_flow_data, FLOW_DATA_LIST)
         print FLOW_DATA_LIST
     else:
-        print "'args.flows_data' is empty, default flow data list will be used: "
+        print "'args.flows_data' is empty, default flow data list will be used..."
         print "Default flow data: %s" % (DEFAULT_FLOW_DATA)
         FLOW_DATA_LIST = []
         FLOW_DATA_LIST.append(DEFAULT_FLOW_DATA)
