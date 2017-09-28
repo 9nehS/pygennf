@@ -163,7 +163,8 @@ def main():
 
     gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST, sport=PORT_SRC, dport=PORT_DST)
 
-    print 'Flows to be sent: ' % FLOW_DATA_LIST
+    print 'Flows to be sent: '
+    print FLOW_DATA_LIST
 
     while TIME_INTERVAL is not 0:
         if SIGNAL_RECEIVED == 1:
