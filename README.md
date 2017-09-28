@@ -51,4 +51,4 @@ Netflow packets generator with Scapy library
 >
 > ![2017-09-28_console_snapshot_02.png](https://github.com/9nehS/pygennf/blob/master/resources/2017-09-28_console_snapshot_02.png)
 >
-> ![2017-09-27_web_snapshot_01.png](https://github.com/9nehS/pygennf/blob/master/resources/2017-09-27_web_snapshot_01.png)
+> ![2017-09-28_web_snapshot_01.png](https://github.com/9nehS/pygennf/blob/master/resources/2017-09-28_web_snapshot_01.png)
