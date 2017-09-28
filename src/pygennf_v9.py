@@ -19,24 +19,37 @@
 import argparse
 import time
 import signal
-
+import re
 
 import scapy
 from scapy.all import *
 
 import rb_netflow.rb_netflow as rbnf
 
-signal_received = 0
+SIGNAL_RECEIVED = 0
 
-dic_protocol_num = {'tcp': 6, 'udp': 17}
+DIC_PROTOCOL_NUM = {'tcp': 6, 'udp': 17}
+DIC_DIRECTION_NUM = {'ingress': 0, 'egress': 1}
+
+# ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes
+# e.g. 11.11.11.11/32:1001:11.11.11.22/32:1002:tcp:ingress:1024
+FLOW_DATA_PATTERN = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}:\d{1,4}:){2}\w+:(ingress|egress):\d{1,4}$'
 
 def preexec():
     os.setpgrp()  # Don't forward signals
 
 
 def signal_handler(signal, frame):
-    global signal_received
-    signal_received = 1
+    global SIGNAL_RECEIVED
+    SIGNAL_RECEIVED = 1
+
+
+def valid_flow_data(flow_data_str=''):
+    global FLOW_DATA_PATTERN
+    m = re.match(FLOW_DATA_PATTERN, flow_data_str)
+    if m is not None:
+        return True
+    return False
 
 
 # Netflow9
@@ -70,9 +83,10 @@ def main():
                         help='Protocols included in netflow data part, e.g. tcp(6) or udp(17).')
     parser.add_argument('-b', '--bytes', dest='bytes',
                         help='Bytes(octets) in single flow, e.g. 1024.')
+    parser.add_argument('-fd', '--flows-data', dest='flows_data',
+                        help='Contents in flows data, e.g. ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes.')
 
     args = parser.parse_args()
-
     if args.src_ip:
         IP_SRC = args.src_ip
     else:
@@ -109,7 +123,7 @@ def main():
 
     if args.protocol:
         try:
-            PROTOCOL_NUM = dic_protocol_num[args.protocol]
+            PROTOCOL_NUM = DIC_PROTOCOL_NUM[args.protocol]
         except KeyError:
             print "Protocol '%s' cannot be mapped to existing protocols, use TCP[6] as default" % (args.protocol)
             PROTOCOL_NUM = 6
@@ -127,6 +141,13 @@ def main():
     else:
         BYTES = 1024
 
+    if args.flows_data:
+        FLOW_DATA_LIST = args.flows_data.split(',')
+        FLOW_DATA_LIST = map(str.strip, FLOW_DATA_LIST)
+        FLOW_DATA_LIST = filter(valid_flow_data, FLOW_DATA_LIST)
+        print FLOW_DATA_LIST
+    else:
+        pass
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -136,14 +157,14 @@ def main():
     gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST, sport=PORT_SRC, dport=PORT_DST)
 
     while TIME_INTERVAL is not 0:
-        if signal_received == 1:
+        if SIGNAL_RECEIVED == 1:
             print "\nSignal received. %s packets have been sent. Stopping and Exiting..." % flow_sequence
             sys.exit(0)
         time.sleep(float(TIME_INTERVAL))
 
         flow_sequence = flow_sequence + 1
         if flow_sequence > PKT_COUNT:
-            print "\nPackets count[%s] reached. Stopping and Exitting..." % PKT_COUNT
+            print "\nPackets count[%s] reached. Stopping and Exiting..." % PKT_COUNT
             sys.exit(0)
         if flow_sequence % 100 == 0:
             gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST,
