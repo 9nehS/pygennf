@@ -80,10 +80,10 @@ def main():
                         help='Time interval to wait before sending each netflow packet.')
     parser.add_argument('-c', '--pkt-count', dest='pkt_count',
                         help='Packets count to be sent before this generator stopping.')
-    parser.add_argument('-p', '--protocol', dest='protocol',
-                        help='Protocols included in netflow data part, e.g. tcp(6) or udp(17).')
-    parser.add_argument('-b', '--bytes', dest='bytes',
-                        help='Bytes(octets) in single flow, e.g. 1024.')
+    # parser.add_argument('-p', '--protocol', dest='protocol',
+    #                     help='Protocols included in netflow data part, e.g. tcp(6) or udp(17).')
+    # parser.add_argument('-b', '--bytes', dest='bytes',
+    #                     help='Bytes(octets) in single flow, e.g. 1024.')
     parser.add_argument('-fd', '--flows-data', dest='flows_data',
                         help='Contents in flows data, e.g. ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes.')
 
@@ -122,25 +122,25 @@ def main():
         # 0xFFFFFFFF - 1
         PKT_COUNT = 4294967294
 
-    if args.protocol:
-        try:
-            PROTOCOL_NUM = DIC_PROTOCOL_NUM[args.protocol]
-        except KeyError:
-            print "Protocol '%s' cannot be mapped to existing protocols, use TCP[6] as default" % (args.protocol)
-            PROTOCOL_NUM = 6
-    else:
-        PROTOCOL_NUM = 6    # TCP by default
-
-    if args.bytes:
-        try:
-            BYTES = int(args.bytes)
-            if BYTES < 1 or BYTES > 4096:
-                raise ValueError
-        except ValueError:
-            print "Bytes '%s' should be integer between 1 and 4096, use 1024 as default" % (args.bytes)
-            BYTES = 1024
-    else:
-        BYTES = 1024
+    # if args.protocol:
+    #     try:
+    #         PROTOCOL_NUM = DIC_PROTOCOL_NUM[args.protocol]
+    #     except KeyError:
+    #         print "Protocol '%s' cannot be mapped to existing protocols, use TCP[6] as default" % (args.protocol)
+    #         PROTOCOL_NUM = 6
+    # else:
+    #     PROTOCOL_NUM = 6    # TCP by default
+    #
+    # if args.bytes:
+    #     try:
+    #         BYTES = int(args.bytes)
+    #         if BYTES < 1 or BYTES > 4096:
+    #             raise ValueError
+    #     except ValueError:
+    #         print "Bytes '%s' should be integer between 1 and 4096, use 1024 as default" % (args.bytes)
+    #         BYTES = 1024
+    # else:
+    #     BYTES = 1024
 
     if args.flows_data:
         FLOW_DATA_LIST = args.flows_data.split(',')
@@ -178,14 +178,14 @@ def main():
             sys.exit(0)
         if flow_sequence % 100 == 0:
             gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST,
-                         sport=PORT_SRC, dport=PORT_DST, protocol_num=PROTOCOL_NUM, octets=BYTES)
+                         sport=PORT_SRC, dport=PORT_DST)
             continue
         gen_send_pkt('data', flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST, sport=PORT_SRC, dport=PORT_DST,
-                     protocol_num=PROTOCOL_NUM, octets=BYTES, flow_data_list=FLOW_DATA_LIST)
+                     flow_data_list=FLOW_DATA_LIST)
 
 
 def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2.2.2.2', sport=2056, dport=2055,
-                 protocol_num=6, octets=1024, flow_data_list=[]):
+                 flow_data_list=[]):
     timestamp = int(time.time())
     if pkt_type == 'tmpl':
         pkt_netflow_tmpl = gen_pkt_netflow_tmpl(timestamp=timestamp, flow_sequence=flow_sequence,
