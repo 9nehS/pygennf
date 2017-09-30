@@ -56,12 +56,19 @@ def valid_flow_data(flow_data_str=''):
 # Netflow9
 def main():
 
-    print "\n****************************"
-    print "* Flow Generator Ver. 0.11 *"
-    print "* Modified by Sheng Zhao   *"
-    print "* Calix Cloud SIT          *"
-    print "* sheng.zhao@calix.com     *"
-    print "****************************\n\n"
+    print "\n**************************************************************************"
+    print "* ______ _                 _____                           _              *"
+    print "* |  ___| |               |  __ \                         | |             *"
+    print "* | |_  | | _____      __ | |  \/ ___ _ __   ___ _ __ __ _| |_ ___  _ __  *"
+    print "* |  _| | |/ _ \ \ /\ / / | | __ / _ \ '_ \ / _ \ '__/ _` | __/ _ \| '__| *"
+    print "* | |   | | (_) \ V  V /  | |_\ \  __/ | | |  __/ | | (_| | || (_) | |    *"
+    print "* \_|   |_|\___/ \_/\_/    \____/\___|_| |_|\___|_|  \__,_|\__\___/|_|    *"
+    print "*                                                                         *"
+    print "* Flow Generator Ver. 0.11                                                *"
+    print "* Modified by Sheng Zhao                                                  *"
+    print "* Calix Cloud SIT                                                         *"
+    print "* sheng.zhao@calix.com                                                    *"
+    print "***************************************************************************\n\n"
 
     if os.getuid() != 0:
         print "You need to be root to run this, sorry."
