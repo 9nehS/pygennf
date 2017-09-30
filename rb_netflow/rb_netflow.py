@@ -3,9 +3,10 @@
 ## Copyright (C) Philippe Biondi <phil@secdev.org>
 ## This program is published under a GPLv2 license
 ## Netflow V5 appended by spaceB0x and Guillaume Valadon
+## Netflow v9 with template ID 260 appended by Sheng
 
 """
-Cisco NetFlow protocol v1 and v5
+Cisco NetFlow protocol v1, v5, v9 and v10
 """
 
 
