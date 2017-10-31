@@ -174,9 +174,11 @@ def main():
     t = threading.Thread(target=start_send, name='SendingThread', args=(IP_SRC, IP_DST, PORT_SRC, PORT_DST,
                                                                         FLOW_DATA_LIST, PKT_COUNT, TIME_INTERVAL))
     t.do_run = True
-    t.setDaemon(True)
+    #t.setDaemon(True)
     t.start()
-    t.join()
+    while True:
+        t.join(5)
+
     print 'Thread %s ended.' % threading.current_thread().name
 
 
@@ -189,7 +191,8 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
     while time_interval is not 0:
         if SIGNAL_RECEIVED == 1:
             print "\nSignal received. %s packets have been sent. Stopping and Exiting..." % flow_sequence
-            sys.exit(0)
+            #sys.exit(0)
+            break
         time.sleep(float(time_interval))
 
         flow_sequence = flow_sequence + 1
