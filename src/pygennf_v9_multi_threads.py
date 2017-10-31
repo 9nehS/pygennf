@@ -192,7 +192,8 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
         flow_sequence = flow_sequence + 1
         if flow_sequence > pkt_count:
             print "\nPackets count[%s] reached. Stopping and Exiting..." % pkt_count
-            sys.exit(0)
+            #sys.exit(0)
+            break
         if flow_sequence % 100 == 0:
             gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst,
                          sport=port_src, dport=port_dst)
