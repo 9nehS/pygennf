@@ -44,6 +44,7 @@ def preexec():
 def signal_handler(signal, frame):
     global SIGNAL_RECEIVED
     SIGNAL_RECEIVED = 1
+    print 'signal_handler invoked...'
 
 
 def valid_flow_data(flow_data_str=''):
@@ -172,6 +173,7 @@ def main():
     print 'Thread %s is running...' % threading.current_thread().name
     t = threading.Thread(target=start_send, name='SendingThread', args=(IP_SRC, IP_DST, PORT_SRC, PORT_DST,
                                                                         FLOW_DATA_LIST, PKT_COUNT, TIME_INTERVAL))
+    t.do_run = True
     t.start()
     t.join()
     print 'Thread %s ended.' % threading.current_thread().name
