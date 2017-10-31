@@ -180,8 +180,6 @@ def main():
 
 
 def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, time_interval):
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
     print 'Thread %s is running...' % threading.current_thread().name
     flow_sequence = 1
     gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src, dport=port_dst)
