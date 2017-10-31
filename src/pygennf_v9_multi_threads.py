@@ -174,6 +174,7 @@ def main():
     t = threading.Thread(target=start_send, name='SendingThread', args=(IP_SRC, IP_DST, PORT_SRC, PORT_DST,
                                                                         FLOW_DATA_LIST, PKT_COUNT, TIME_INTERVAL))
     t.do_run = True
+    t.setDaemon(True)
     t.start()
     t.join()
     print 'Thread %s ended.' % threading.current_thread().name
