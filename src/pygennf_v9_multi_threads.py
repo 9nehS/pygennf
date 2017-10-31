@@ -20,6 +20,7 @@ import argparse
 import time
 import signal
 import re
+import threading
 
 import scapy
 from scapy.all import *
@@ -166,29 +167,40 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
+    #start_send(IP_SRC, IP_DST, PORT_SRC, PORT_DST, FLOW_DATA_LIST, PKT_COUNT, TIME_INTERVAL)
+
+    print 'Thread %s is running...' % threading.current_thread().name
+    t = threading.Thread(target=start_send, name='SendingThread', args=(IP_SRC, IP_DST, PORT_SRC, PORT_DST,
+                                                                        FLOW_DATA_LIST, PKT_COUNT, TIME_INTERVAL))
+    t.start()
+    t.join()
+    print 'Thread %s ended.' % threading.current_thread().name
+
+
+def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, time_interval):
+    print 'Thread %s is running...' % threading.current_thread().name
     flow_sequence = 1
-
-    gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST, sport=PORT_SRC, dport=PORT_DST)
-
+    gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src, dport=port_dst)
     print 'Flows to be sent: '
-    print FLOW_DATA_LIST
-
-    while TIME_INTERVAL is not 0:
+    print flow_data_list
+    while time_interval is not 0:
         if SIGNAL_RECEIVED == 1:
             print "\nSignal received. %s packets have been sent. Stopping and Exiting..." % flow_sequence
             sys.exit(0)
-        time.sleep(float(TIME_INTERVAL))
+        time.sleep(float(time_interval))
 
         flow_sequence = flow_sequence + 1
-        if flow_sequence > PKT_COUNT:
-            print "\nPackets count[%s] reached. Stopping and Exiting..." % PKT_COUNT
+        if flow_sequence > pkt_count:
+            print "\nPackets count[%s] reached. Stopping and Exiting..." % pkt_count
             sys.exit(0)
         if flow_sequence % 100 == 0:
-            gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST,
-                         sport=PORT_SRC, dport=PORT_DST)
+            gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst,
+                         sport=port_src, dport=port_dst)
             continue
-        gen_send_pkt('data', flow_sequence, src_ip=IP_SRC, dst_ip=IP_DST, sport=PORT_SRC, dport=PORT_DST,
-                     flow_data_list=FLOW_DATA_LIST)
+        gen_send_pkt('data', flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src, dport=port_dst,
+                     flow_data_list=flow_data_list)
+
+    print 'Thread %s ended.' % threading.current_thread().name
 
 
 def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2.2.2.2', sport=2056, dport=2055,
