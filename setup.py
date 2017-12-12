@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name="pygennf",
       version="0.11",
@@ -8,8 +8,10 @@ setup(name="pygennf",
       url="https://github.com/9nehS/",
       license="AGPL",
       scripts=["src/pygennf_v9.py", "src/pygennf_v9_multi_threads.py"],
-      packages=['rb_netflow', 'web_api'],
+      # packages=['rb_netflow', 'web_api'],
+      packages=find_packages(),
       install_requires=[
           'scapy',
+          'flask'
       ]
       )
