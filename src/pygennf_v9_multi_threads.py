@@ -78,6 +78,10 @@ def create():
     # t.do_run = True
     # t.setDaemon(True)
     t.start()
+    return jsonify(
+        {'Status': 'Sending task created successfully',
+         'TaskName': 'This is task name'
+         })
     # while True:
     #     t.join(5)
     #     if not t.isAlive():
