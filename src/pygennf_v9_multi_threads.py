@@ -23,7 +23,7 @@ import threading
 from scapy.all import *
 
 import rb_netflow.rb_netflow as rbnf
-from web_api import web_api
+import web_api.web_api as api
 
 SIGNAL_RECEIVED = 0
 
@@ -99,7 +99,7 @@ def main():
     args = parser.parse_args()
 
     if args.remote:
-        web_api.start()
+        api.start()
         sys.exit(0)
 
     if args.src_ip:
