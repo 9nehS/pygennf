@@ -26,6 +26,7 @@ def send():
         abort(404)
     print request.json
     ip_src = request.json['ip_src']
+    print 'ip_src: %s' % ip_src
     ip_dst = request.json['ip_dst']
     port_src = int(request.json['port_src'])
     port_dst = int(request.json['port_dst'])
