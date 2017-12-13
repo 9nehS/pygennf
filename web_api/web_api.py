@@ -36,7 +36,9 @@ def send():
     flow_data_list = get_flow_data_list(request.json['flows-data'], DEFAULT_FLOW_DATA)
     print 'flow_data_list: %s' % flow_data_list
     pkt_count = int(request.json['pkt_count'])
+    print 'pkt_count:', pkt_count
     time_interval = request.json['time_interval']
+    print 'time_interval: %s' % time_interval
     print 'Thread %s is running...' % threading.current_thread().name
     t = threading.Thread(target=start_send, name='SendingThread', args=(ip_src, ip_dst, port_src, port_dst,
                                                                         flow_data_list, pkt_count, time_interval))
