@@ -2,8 +2,6 @@ import threading
 
 from flask import Flask, jsonify, request, abort
 
-from src.pygennf_v9_multi_threads import get_flow_data_list, DEFAULT_FLOW_DATA, start_send
-
 app = Flask(__name__)
 
 @app.route('/')
