@@ -78,12 +78,12 @@ def create():
     # t.do_run = True
     # t.setDaemon(True)
     t.start()
-    while True:
-        t.join(5)
-        if not t.isAlive():
-            break
-
-    print 'Thread %s ended.' % threading.current_thread().name
+    # while True:
+    #     t.join(5)
+    #     if not t.isAlive():
+    #         break
+    #
+    # print 'Thread %s ended.' % threading.current_thread().name
 
 
 def preexec():
