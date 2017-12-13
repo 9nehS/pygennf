@@ -191,6 +191,7 @@ def main():
 
 
 def get_flow_data_list(args_flows_data, default_flow_data):
+    print 'get_flow_data_list() start...'
     flow_data_list = args_flows_data.split(',')
     flow_data_list = map(str.strip, flow_data_list)
     flow_data_list = filter(valid_flow_data, flow_data_list)
