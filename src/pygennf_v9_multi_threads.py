@@ -103,38 +103,38 @@ def main():
         sys.exit(0)
 
     if args.src_ip:
-        IP_SRC = args.src_ip
+        ip_src = args.src_ip
     else:
-        IP_SRC = "10.0.203.2"
+        ip_src = "10.0.203.2"
 
     if args.dst_ip:
-        IP_DST = args.dst_ip
+        ip_dst = args.dst_ip
     else:
-        IP_DST = "10.0.30.89"
+        ip_dst = "10.0.30.89"
 
-    if IP_DST == "127.0.0.1":
+    if ip_dst == "127.0.0.1":
         conf.L3socket=L3RawSocket
 
     if args.src_port:
-        PORT_SRC = int(args.src_port)
+        port_src = int(args.src_port)
     else:
-        PORT_SRC = int(2056)
+        port_src = int(2056)
 
     if args.dst_port:
-        PORT_DST = int(args.dst_port)
+        port_dst = int(args.dst_port)
     else:
-        PORT_DST = int(2055)
+        port_dst = int(2055)
 
     if args.time_interval:
-        TIME_INTERVAL = args.time_interval
+        time_interval = args.time_interval
     else:
-        TIME_INTERVAL = 1
+        time_interval = 1
 
     if args.pkt_count:
-        PKT_COUNT = int(args.pkt_count)
+        pkt_count = int(args.pkt_count)
     else:
         # 0xFFFFFFFF - 1
-        PKT_COUNT = 4294967294
+        pkt_count = 4294967294
 
     # if args.protocol:
     #     try:
@@ -157,18 +157,19 @@ def main():
     #     BYTES = 1024
 
     if args.flows_data:
-        FLOW_DATA_LIST = args.flows_data.split(',')
-        FLOW_DATA_LIST = map(str.strip, FLOW_DATA_LIST)
-        FLOW_DATA_LIST = filter(valid_flow_data, FLOW_DATA_LIST)
-        if len(FLOW_DATA_LIST) == 0:
-            print 'No valid flow data list, default flow data list will be used...'
-            print "Default flow data: %s" % (DEFAULT_FLOW_DATA)
-            FLOW_DATA_LIST.append(DEFAULT_FLOW_DATA)
+        # FLOW_DATA_LIST = args.flows_data.split(',')
+        # FLOW_DATA_LIST = map(str.strip, FLOW_DATA_LIST)
+        # FLOW_DATA_LIST = filter(valid_flow_data, FLOW_DATA_LIST)
+        # if len(FLOW_DATA_LIST) == 0:
+        #     print 'No valid flow data list, default flow data list will be used...'
+        #     print "Default flow data: %s" % (DEFAULT_FLOW_DATA)
+        #     FLOW_DATA_LIST.append(DEFAULT_FLOW_DATA)
+        flow_data_list = get_flow_data_list(args.flows_data, DEFAULT_FLOW_DATA)
     else:
         print "'args.flows_data' is empty, default flow data list will be used..."
         print "Default flow data: %s" % (DEFAULT_FLOW_DATA)
-        FLOW_DATA_LIST = []
-        FLOW_DATA_LIST.append(DEFAULT_FLOW_DATA)
+        flow_data_list = []
+        flow_data_list.append(DEFAULT_FLOW_DATA)
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -176,8 +177,8 @@ def main():
     #start_send(IP_SRC, IP_DST, PORT_SRC, PORT_DST, FLOW_DATA_LIST, PKT_COUNT, TIME_INTERVAL)
 
     print 'Thread %s is running...' % threading.current_thread().name
-    t = threading.Thread(target=start_send, name='SendingThread', args=(IP_SRC, IP_DST, PORT_SRC, PORT_DST,
-                                                                        FLOW_DATA_LIST, PKT_COUNT, TIME_INTERVAL))
+    t = threading.Thread(target=start_send, name='SendingThread', args=(ip_src, ip_dst, port_src, port_dst,
+                                                                        flow_data_list, pkt_count, time_interval))
     #t.do_run = True
     #t.setDaemon(True)
     t.start()
@@ -187,6 +188,18 @@ def main():
             break
 
     print 'Thread %s ended.' % threading.current_thread().name
+
+
+def get_flow_data_list(args_flows_data, default_flow_data):
+    flow_data_list = args_flows_data.split(',')
+    flow_data_list = map(str.strip, flow_data_list)
+    flow_data_list = filter(valid_flow_data, flow_data_list)
+    if len(flow_data_list) == 0:
+        print 'No valid flow data list, default flow data list will be used...'
+        print "Default flow data: %s" % (default_flow_data)
+        flow_data_list.append(default_flow_data)
+    return flow_data_list
+
 
 
 def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, time_interval):
