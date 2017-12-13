@@ -28,9 +28,13 @@ def send():
     ip_src = request.json['ip_src']
     print 'ip_src: %s' % ip_src
     ip_dst = request.json['ip_dst']
+    print 'ip_dst: %s' % ip_dst
     port_src = int(request.json['port_src'])
+    print 'port_src: ', port_src
     port_dst = int(request.json['port_dst'])
+    print 'port_dst: ', port_dst
     flow_data_list = get_flow_data_list(request.json['flows-data'], DEFAULT_FLOW_DATA)
+    print 'flow_data_list: %s' % flow_data_list
     pkt_count = int(request.json['pkt_count'])
     time_interval = request.json['time_interval']
     print 'Thread %s is running...' % threading.current_thread().name
