@@ -24,6 +24,7 @@ def send():
     print "send() invoked..."
     if not request.json:
         abort(404)
+    print request.json
     ip_src = request.json['ip_src']
     ip_dst = request.json['ip_dst']
     port_src = int(request.json['port_src'])
