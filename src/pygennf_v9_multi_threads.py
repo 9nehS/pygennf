@@ -93,7 +93,7 @@ def main():
     #                     help='Bytes(octets) in single flow, e.g. 1024.')
     parser.add_argument('-fd', '--flows-data', dest='flows_data',
                         help='Contents in flows data, e.g. ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes.')
-    parser.add_argument('-r', '--remote', dest='remote',
+    parser.add_argument('-r', '--remote', dest='remote', action="store_true",
                         help='Listen on TCP port 9080 as API server. All other parameters will be ignored.')
 
     args = parser.parse_args()
