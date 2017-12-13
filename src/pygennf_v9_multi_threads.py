@@ -251,6 +251,7 @@ def get_flow_data_list(args_flows_data, default_flow_data):
         print 'No valid flow data list, default flow data list will be used...'
         print "Default flow data: %s" % (default_flow_data)
         flow_data_list.append(default_flow_data)
+    print 'flow_data_list before return:', flow_data_list
     return flow_data_list
 
 
