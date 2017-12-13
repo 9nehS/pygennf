@@ -213,13 +213,6 @@ def main():
     #     BYTES = 1024
 
     if args.flows_data:
-        # FLOW_DATA_LIST = args.flows_data.split(',')
-        # FLOW_DATA_LIST = map(str.strip, FLOW_DATA_LIST)
-        # FLOW_DATA_LIST = filter(valid_flow_data, FLOW_DATA_LIST)
-        # if len(FLOW_DATA_LIST) == 0:
-        #     print 'No valid flow data list, default flow data list will be used...'
-        #     print "Default flow data: %s" % (DEFAULT_FLOW_DATA)
-        #     FLOW_DATA_LIST.append(DEFAULT_FLOW_DATA)
         flow_data_list = get_flow_data_list(args.flows_data, DEFAULT_FLOW_DATA)
     else:
         print "'args.flows_data' is empty, default flow data list will be used..."
@@ -317,45 +310,8 @@ def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=36000
                                       FlowSequence=flow_sequence, SourceId=2177)
     flowset_flow_header_v9 = rbnf.FlowSet_Header_v9(FlowSet_id=260, FlowSet_length=72)
 
-    # List for SrcAddr and DstAddr in netflow data
-    # src_dst_addr_list = []
-    # src_dst_addr_list.append(['69.31.102.10', '209.81.108.20'])
-    # src_dst_addr_list.append(['70.32.103.11', '210.81.108.21'])
-    # src_dst_addr_list.append(['70.32.103.12', '210.81.108.22'])
-    # src_dst_addr_list.append(['70.32.103.13', '210.81.108.23'])
-    # src_dst_addr_list.append(['70.32.103.14', '210.81.108.24'])
-    # src_dst_addr_list.append(['70.32.103.15', '210.81.108.25'])
-    # src_dst_addr_list.append(['70.32.103.16', '210.81.108.26'])
-    # src_dst_addr_list.append(['70.32.103.17', '210.81.108.27'])
-    # src_dst_addr_list.append(['70.32.103.18', '210.81.108.28'])
-    # src_dst_addr_list.append(['70.32.103.19', '210.81.108.29'])
-    # src_dst_addr_list.append(['70.32.103.20', '210.81.108.30'])
-    # src_dst_addr_list.append(['70.32.103.21', '210.81.108.31'])
-    # src_dst_addr_list.append(['70.32.103.22', '210.81.108.32'])
-    # src_dst_addr_list.append(['70.32.103.23', '210.81.108.33'])
-    # src_dst_addr_list.append(['70.32.103.24', '210.81.108.34'])
-    # src_dst_addr_list.append(['70.32.103.25', '210.81.108.35'])
-    # src_dst_addr_list.append(['70.32.103.26', '210.81.108.36'])
-    # src_dst_addr_list.append(['70.32.103.27', '210.81.108.37'])
-    # src_dst_addr_list.append(['70.32.103.28', '210.81.108.38'])
-    # src_dst_addr_list.append(['70.32.103.29', '210.81.108.39'])
-    # src_dst_addr_list.append(['70.32.103.30', '210.81.108.40'])
-    # src_dst_port_list = []
-    # src_dst_port_list.append([12345, 80])
-
     # List for flows in one packet
     flows = []
-    # for src_dst_addr in src_dst_addr_list:
-    #     #end_time = sys_uptime + 3600 * 1000
-    #     end_time = timestamp
-    #     start_time = end_time - 1000     # Duration 1s
-    #     flows.append(rbnf.Flow_260_v9(
-    #         Packets=1, Octets=octets, SrcAddr=src_dst_addr[0], DstAddr=src_dst_addr[1], InputInt=145, OutputInt=142,
-    #         EndTime=end_time, StartTime=start_time, SrcPort=src_dst_port_list[0][0], DstPort=src_dst_port_list[0][1],
-    #         SrcAS=0, DstAS=0, BGPNextHop='0.0.0.0', SrcMask=17, DstMask=28, Protocol=protocol_num, TCPFlags=0x10, IPToS=0x00,
-    #         Direction=0, ForwardingStatus=0x40, SamplerID=2, IngressVRFID=0x60000000, EgressVRFID=0x60000000
-    #     ))
-
 
     # To process flow_data_list
     for flow_data in flow_data_list:
@@ -487,4 +443,3 @@ def gen_pkt_netflow_tmpl(timestamp=1503652676, flow_sequence=1, source_id=2177, 
 
 if __name__ == '__main__':
     main()
-
