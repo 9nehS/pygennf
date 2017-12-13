@@ -21,6 +21,7 @@ def help():
 
 @app.route('/pygennf/send', methods=['POST'])
 def send():
+    print "send() invoked..."
     if not request.json:
         abort(404)
     ip_src = request.json['ip_src']
