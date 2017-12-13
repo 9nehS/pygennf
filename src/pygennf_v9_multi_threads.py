@@ -20,13 +20,12 @@ import argparse
 import signal
 import threading
 
+from flask import Flask, jsonify, request, abort
 from scapy.all import *
 
 import rb_netflow.rb_netflow as rbnf
-import web_api.web_api as api
 
 SIGNAL_RECEIVED = 0
-
 DIC_PROTOCOL_NUM = {'tcp': 6, 'udp': 17}
 DIC_DIRECTION_NUM = {'ingress': 0, 'egress': 1}
 
@@ -34,6 +33,58 @@ DIC_DIRECTION_NUM = {'ingress': 0, 'egress': 1}
 # e.g. 11.11.11.11/32:1001:11.11.11.22/32:1002:tcp:ingress:1024
 FLOW_DATA_PATTERN = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}:\d{1,5}:){2}\w+:(ingress|egress):\d{1,4}$'
 DEFAULT_FLOW_DATA = '11.11.11.11/32:1001:11.11.11.22/32:80:tcp:ingress:1024'
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def help():
+    return jsonify(
+        # 'API (application/json)': 'PATH, notes ?org-id=<orgId> currently required',
+        {'Cache clean': '/marketing/cache/clean?org-ids=<org-ids>',
+         'Cache clean and rebuild': '/marketing/cache/clean-rebuild?org-ids=<org-ids>&rebuild-table=true',
+         'Cache status': '/marketing/cache/status',
+         'On board': '/marketing/onboard?org-ids=<org-ids>',
+         'On board status': '/marketing/onboard/status',
+         'Delayed scheduled rebuild task': 'add:/marketing/cache/rebuild/operation?opt=add&org-ids=<org-ids> '
+                                           'delete:/marketing/cache/rebuild/operation?opt=delete&org-ids=<org-ids>',
+         'Delayed task status': '/marketing/cache/rebuild/status?org-id=<org-ids>'
+         })
+
+
+@app.route('/pygennf/send', methods=['POST'])
+def send():
+    print "send() invoked..."
+    if not request.json:
+        abort(404)
+    print request.json
+    ip_src = request.json['ip_src']
+    print 'ip_src: %s' % ip_src
+    ip_dst = request.json['ip_dst']
+    print 'ip_dst: %s' % ip_dst
+    port_src = int(request.json['port_src'])
+    print 'port_src: ', port_src
+    port_dst = int(request.json['port_dst'])
+    print 'port_dst: ', port_dst
+    flow_data_list = get_flow_data_list(request.json['flows-data'], DEFAULT_FLOW_DATA)
+    print 'flow_data_list: %s' % flow_data_list
+    pkt_count = int(request.json['pkt_count'])
+    print 'pkt_count:', pkt_count
+    time_interval = request.json['time_interval']
+    print 'time_interval: %s' % time_interval
+    print 'Thread %s is running...' % threading.current_thread().name
+    t = threading.Thread(target=start_send, name='SendingThread', args=(ip_src, ip_dst, port_src, port_dst,
+                                                                        flow_data_list, pkt_count, time_interval))
+    # t.do_run = True
+    # t.setDaemon(True)
+    t.start()
+    while True:
+        t.join(5)
+        if not t.isAlive():
+            break
+
+    print 'Thread %s ended.' % threading.current_thread().name
+
 
 def preexec():
     os.setpgrp()  # Don't forward signals
@@ -99,7 +150,8 @@ def main():
     args = parser.parse_args()
 
     if args.remote:
-        api.start()
+        # api.start()
+        app.run(host='0.0.0.0', port=9080)
         sys.exit(0)
 
     if args.src_ip:
