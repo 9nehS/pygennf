@@ -52,9 +52,9 @@ def help():
          })
 
 
-@app.route('/pygennf/send', methods=['POST'])
-def send():
-    print "send() invoked..."
+@app.route('/pygennf/tasks/create', methods=['POST'])
+def create():
+    print "create() invoked..."
     if not request.json:
         abort(404)
     print request.json
