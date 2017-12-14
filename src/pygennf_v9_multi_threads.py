@@ -17,6 +17,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
+import json
 import signal
 import threading
 
@@ -53,7 +54,8 @@ def help():
 
 @app.route('/pygennf/tasks/status', methods=['GET'])
 def status():
-    return jsonify(threads_dict)
+    status_info = json.dumps(threads_dict)
+    return jsonify(status_info)
 
 
 @app.route('/pygennf/tasks/create', methods=['POST'])
