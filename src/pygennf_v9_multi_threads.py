@@ -25,6 +25,7 @@ from scapy.all import *
 
 import rb_netflow.rb_netflow as rbnf
 from utils.logger_util import get_logger, set_logger_level
+from utils.uuid_util import get_uuid
 
 SIGNAL_RECEIVED = 0
 DIC_PROTOCOL_NUM = {'tcp': 6, 'udp': 17}
@@ -38,6 +39,7 @@ DEFAULT_FLOW_DATA = '11.11.11.11/32:1001:11.11.11.22/32:80:tcp:ingress:1024'
 
 app = Flask(__name__)
 logger = get_logger('pygennf')
+threads_dict = collections.OrderedDict()
 
 @app.route('/')
 def help():
@@ -88,6 +90,8 @@ def create():
                                                                         flow_data_list, pkt_count, time_interval))
     # t.do_run = True
     # t.setDaemon(True)
+    threads_dict[str(get_uuid())] = [time.time(), t]
+    logger.debug(prefix_logger + 'threads_dict: %s' % threads_dict)
     t.start()
     return jsonify(
         {'Status': 'Sending task created successfully',
