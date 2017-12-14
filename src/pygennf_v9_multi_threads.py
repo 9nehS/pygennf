@@ -24,6 +24,7 @@ from flask import Flask, jsonify, request, abort
 from scapy.all import *
 
 import rb_netflow.rb_netflow as rbnf
+from utils.logger import get_logger, set_logger_level
 
 SIGNAL_RECEIVED = 0
 DIC_PROTOCOL_NUM = {'tcp': 6, 'udp': 17}
@@ -34,8 +35,9 @@ DIC_DIRECTION_NUM = {'ingress': 0, 'egress': 1}
 FLOW_DATA_PATTERN = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}:\d{1,5}:){2}\w+:(ingress|egress):\d{1,4}$'
 DEFAULT_FLOW_DATA = '11.11.11.11/32:1001:11.11.11.22/32:80:tcp:ingress:1024'
 
-app = Flask(__name__)
 
+app = Flask(__name__)
+logger = get_logger('pygennf')
 
 @app.route('/')
 def help():
@@ -54,25 +56,33 @@ def help():
 
 @app.route('/pygennf/tasks/create', methods=['POST'])
 def create():
-    print "create() invoked..."
+    # print "create() invoked..."
     if not request.json:
         abort(404)
-    print request.json
+    # print request.json
     ip_src = request.json['ip_src'].encode("ascii")
-    print 'ip_src: %s' % ip_src
+    # print 'ip_src: %s' % ip_src
+    logger.debug('ip_src: %s' % ip_src)
     ip_dst = request.json['ip_dst'].encode("ascii")
-    print 'ip_dst: %s' % ip_dst
+    # print 'ip_dst: %s' % ip_dst
+    logger.debug('ip_dst: %s' % ip_dst)
     port_src = int(request.json['port_src'])
-    print 'port_src: ', port_src
+    # print 'port_src:', port_src
+    logger.debug('port_src:', port_src)
     port_dst = int(request.json['port_dst'])
-    print 'port_dst: ', port_dst
+    # print 'port_dst:', port_dst
+    logger.debug('port_dst:', port_dst)
     flow_data_list = get_flow_data_list(request.json['flows-data'].encode("ascii"), DEFAULT_FLOW_DATA)
-    print 'flow_data_list: %s' % flow_data_list
+    # print 'flow_data_list: %s' % flow_data_list
+    logger.debug('flow_data_list: %s' % flow_data_list)
     pkt_count = int(request.json['pkt_count'])
-    print 'pkt_count:', pkt_count
+    # print 'pkt_count:', pkt_count
+    logger.debug('pkt_count:', pkt_count)
     time_interval = request.json['time_interval'].encode("ascii")
-    print 'time_interval: %s' % time_interval
-    print 'Thread %s is running...' % threading.current_thread().name
+    # print 'time_interval: %s' % time_interval
+    logger.debug('time_interval: %s' % time_interval)
+    # print 'Thread %s is running...' % threading.current_thread().name
+    logger.info('Thread %s is running...' % threading.current_thread().name)
     t = threading.Thread(target=start_send, name='SendingThread', args=(ip_src, ip_dst, port_src, port_dst,
                                                                         flow_data_list, pkt_count, time_interval))
     # t.do_run = True
@@ -90,10 +100,6 @@ def create():
     # print 'Thread %s ended.' % threading.current_thread().name
 
 
-def preexec():
-    os.setpgrp()  # Don't forward signals
-
-
 def signal_handler(signal, frame):
     global SIGNAL_RECEIVED
     SIGNAL_RECEIVED = 1
@@ -108,27 +114,7 @@ def valid_flow_data(flow_data_str=''):
     return False
 
 
-# Netflow9
-def main():
-
-    print "\n***************************************************************************"
-    print "* ______ _                 _____                           _              *"
-    print "* |  ___| |               |  __ \                         | |             *"
-    print "* | |_  | | _____      __ | |  \/ ___ _ __   ___ _ __ __ _| |_ ___  _ __  *"
-    print "* |  _| | |/ _ \ \ /\ / / | | __ / _ \ '_ \ / _ \ '__/ _` | __/ _ \| '__| *"
-    print "* | |   | | (_) \ V  V /  | |_\ \  __/ | | |  __/ | | (_| | || (_) | |    *"
-    print "* \_|   |_|\___/ \_/\_/    \____/\___|_| |_|\___|_|  \__,_|\__\___/|_|    *"
-    print "*                                                                         *"
-    print "* Flow Generator Ver. 0.11                                                *"
-    print "* Modified by Sheng Zhao                                                  *"
-    print "* Calix Cloud SIT                                                         *"
-    print "* sheng.zhao@calix.com                                                    *"
-    print "***************************************************************************\n\n"
-
-    if os.getuid() != 0:
-        print "You need to be root to run this, sorry."
-        return
-
+def get_parser():
     parser = argparse.ArgumentParser(description='Netflow packets generator with scapy')
     parser.add_argument('-s', '--source-ip', dest='src_ip',
                         help='Source IP of netflow packet(s).')
@@ -150,8 +136,35 @@ def main():
                         help='Contents in flows data, e.g. ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes.')
     parser.add_argument('-r', '--remote', dest='remote', action="store_true",
                         help='Listen on TCP port 9080 as API server. All other parameters will be ignored.')
+    parser.add_argument('-ll', '--log-level', dest='log_level', type=str, choices=['info', 'debug'],
+                        help='Log level, default log level is info')
+    return parser.parse_args()
 
-    args = parser.parse_args()
+
+# Netflow9
+def main():
+    print "\n***************************************************************************"
+    print "* ______ _                 _____                           _              *"
+    print "* |  ___| |               |  __ \                         | |             *"
+    print "* | |_  | | _____      __ | |  \/ ___ _ __   ___ _ __ __ _| |_ ___  _ __  *"
+    print "* |  _| | |/ _ \ \ /\ / / | | __ / _ \ '_ \ / _ \ '__/ _` | __/ _ \| '__| *"
+    print "* | |   | | (_) \ V  V /  | |_\ \  __/ | | |  __/ | | (_| | || (_) | |    *"
+    print "* \_|   |_|\___/ \_/\_/    \____/\___|_| |_|\___|_|  \__,_|\__\___/|_|    *"
+    print "*                                                                         *"
+    print "* Flow Generator Ver. 0.11                                                *"
+    print "* Modified by Sheng Zhao                                                  *"
+    print "* Calix Cloud SIT                                                         *"
+    print "* sheng.zhao@calix.com                                                    *"
+    print "***************************************************************************\n\n"
+
+    if os.getuid() != 0:
+        print "You need to be root to run this, sorry."
+        return
+
+    args = get_parser()
+
+    if args.log_level:
+        set_logger_level(logger, args.log_level)
 
     if args.remote:
         # api.start()
