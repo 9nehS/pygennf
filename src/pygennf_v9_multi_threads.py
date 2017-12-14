@@ -91,11 +91,13 @@ def create():
     logger.debug(prefix_logger + 'time_interval: %s' % time_interval)
     # print 'Thread %s is running...' % threading.current_thread().name
     logger.info(prefix_logger + 'Thread %s is running...' % threading.current_thread().name)
-    t = threading.Thread(target=start_send, name='SendingThread', args=(ip_src, ip_dst, port_src, port_dst,
+
+    task_uuid = get_uuid()
+    t = threading.Thread(target=start_send, name=task_uuid, args=(ip_src, ip_dst, port_src, port_dst,
                                                                         flow_data_list, pkt_count, time_interval))
     # t.do_run = True
     # t.setDaemon(True)
-    task_uuid = get_uuid()
+
     threads_dict[task_uuid] = [datetime.now().isoformat(), t]
     logger.debug(prefix_logger + 'threads_dict: %s' % threads_dict)
     t.start()
