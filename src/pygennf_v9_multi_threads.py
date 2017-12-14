@@ -56,7 +56,8 @@ def help():
 def status():
     status_info_dict = {}
     for k, v in threads_dict.items():
-        status_info_dict[k] = [v['start_time'], v['thread'].__repr__(), v['pkt_sent']]
+        status_info_dict[k] = {'start_time': v['start_time'], 'task_info': v['thread'].__repr__(),
+                               'pkt_sent': v['pkt_sent']}
     # status_info = json.dumps(status_info_dict)
     return jsonify(status_info_dict)
 
