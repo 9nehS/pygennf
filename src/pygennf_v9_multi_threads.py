@@ -41,19 +41,19 @@ app = Flask(__name__)
 logger = get_logger('pygennf')
 threads_dict = collections.OrderedDict()
 
-@app.route('/')
+
+@app.route('/pygennf/help')
 def help():
     return jsonify(
         # 'API (application/json)': 'PATH, notes ?org-id=<orgId> currently required',
-        {'Cache clean': '/marketing/cache/clean?org-ids=<org-ids>',
-         'Cache clean and rebuild': '/marketing/cache/clean-rebuild?org-ids=<org-ids>&rebuild-table=true',
-         'Cache status': '/marketing/cache/status',
-         'On board': '/marketing/onboard?org-ids=<org-ids>',
-         'On board status': '/marketing/onboard/status',
-         'Delayed scheduled rebuild task': 'add:/marketing/cache/rebuild/operation?opt=add&org-ids=<org-ids> '
-                                           'delete:/marketing/cache/rebuild/operation?opt=delete&org-ids=<org-ids>',
-         'Delayed task status': '/marketing/cache/rebuild/status?org-id=<org-ids>'
+        {'Create sending task': '/pygennf/tasks/create',
+         'Check tasks status': '/pygennf/tasks/status'
          })
+
+
+@app.route('/pygennf/tasks/status', methods=['GET'])
+def status():
+    return jsonify(threads_dict)
 
 
 @app.route('/pygennf/tasks/create', methods=['POST'])
