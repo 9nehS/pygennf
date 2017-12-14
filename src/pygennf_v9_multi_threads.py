@@ -270,7 +270,7 @@ def get_flow_data_list(args_flows_data, default_flow_data):
         flow_data_list.append(default_flow_data)
     # print 'flow_data_list before return:', flow_data_list
     logger.debug(prefix_logger + 'flow_data_list before return: %s' % flow_data_list)
-    logger.debug(prefix_logger + '...')
+    logger.debug(prefix_logger + 'Leaving...')
     return flow_data_list
 
 
