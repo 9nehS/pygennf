@@ -17,10 +17,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import json
 import signal
 import threading
-from datetime import datetime
 
 from flask import Flask, jsonify, request, abort
 from scapy.all import *
@@ -58,8 +56,8 @@ def status():
     status_info_dict = {}
     for k, v in threads_dict.items():
         status_info_dict[k] = [v[0], v[1].__repr__()]
-    status_info = json.dumps(status_info_dict)
-    return jsonify(status_info)
+    # status_info = json.dumps(status_info_dict)
+    return jsonify(status_info_dict)
 
 
 @app.route('/pygennf/tasks/create', methods=['POST'])
