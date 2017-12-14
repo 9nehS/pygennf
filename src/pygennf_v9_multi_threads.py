@@ -68,16 +68,16 @@ def create():
     logger.debug('ip_dst: %s' % ip_dst)
     port_src = int(request.json['port_src'])
     # print 'port_src:', port_src
-    logger.debug('port_src:', port_src)
+    logger.debug('port_src: %s' % port_src)
     port_dst = int(request.json['port_dst'])
     # print 'port_dst:', port_dst
-    logger.debug('port_dst:', port_dst)
+    logger.debug('port_dst: %s' % port_dst)
     flow_data_list = get_flow_data_list(request.json['flows-data'].encode("ascii"), DEFAULT_FLOW_DATA)
     # print 'flow_data_list: %s' % flow_data_list
     logger.debug('flow_data_list: %s' % flow_data_list)
     pkt_count = int(request.json['pkt_count'])
     # print 'pkt_count:', pkt_count
-    logger.debug('pkt_count:', pkt_count)
+    logger.debug('pkt_count: %s' % pkt_count)
     time_interval = request.json['time_interval'].encode("ascii")
     # print 'time_interval: %s' % time_interval
     logger.debug('time_interval: %s' % time_interval)
