@@ -56,33 +56,34 @@ def help():
 
 @app.route('/pygennf/tasks/create', methods=['POST'])
 def create():
+    prefix_logger = '[Method][create]'
     # print "create() invoked..."
     if not request.json:
         abort(404)
     # print request.json
     ip_src = request.json['ip_src'].encode("ascii")
     # print 'ip_src: %s' % ip_src
-    logger.debug('ip_src: %s' % ip_src)
+    logger.debug(prefix_logger + 'ip_src: %s' % ip_src)
     ip_dst = request.json['ip_dst'].encode("ascii")
     # print 'ip_dst: %s' % ip_dst
-    logger.debug('ip_dst: %s' % ip_dst)
+    logger.debug(prefix_logger + 'ip_dst: %s' % ip_dst)
     port_src = int(request.json['port_src'])
     # print 'port_src:', port_src
-    logger.debug('port_src: %s' % port_src)
+    logger.debug(prefix_logger + 'port_src: %s' % port_src)
     port_dst = int(request.json['port_dst'])
     # print 'port_dst:', port_dst
-    logger.debug('port_dst: %s' % port_dst)
+    logger.debug(prefix_logger + 'port_dst: %s' % port_dst)
     flow_data_list = get_flow_data_list(request.json['flows-data'].encode("ascii"), DEFAULT_FLOW_DATA)
     # print 'flow_data_list: %s' % flow_data_list
-    logger.debug('flow_data_list: %s' % flow_data_list)
+    logger.debug(prefix_logger + 'flow_data_list: %s' % flow_data_list)
     pkt_count = int(request.json['pkt_count'])
     # print 'pkt_count:', pkt_count
-    logger.debug('pkt_count: %s' % pkt_count)
+    logger.debug(prefix_logger + 'pkt_count: %s' % pkt_count)
     time_interval = request.json['time_interval'].encode("ascii")
     # print 'time_interval: %s' % time_interval
-    logger.debug('time_interval: %s' % time_interval)
+    logger.debug(prefix_logger + 'time_interval: %s' % time_interval)
     # print 'Thread %s is running...' % threading.current_thread().name
-    logger.info('Thread %s is running...' % threading.current_thread().name)
+    logger.info(prefix_logger + 'Thread %s is running...' % threading.current_thread().name)
     t = threading.Thread(target=start_send, name='SendingThread', args=(ip_src, ip_dst, port_src, port_dst,
                                                                         flow_data_list, pkt_count, time_interval))
     # t.do_run = True
@@ -253,8 +254,9 @@ def main():
 
 
 def get_flow_data_list(args_flows_data, default_flow_data):
+    prefix_logger = '[Method][get_flow_data_list]'
     # print 'get_flow_data_list() start...'
-    logger.debug('Enter get_flow_data_list()...')
+    logger.debug(prefix_logger + 'Entering...')
     # print 'type(args_flows_data):', type(args_flows_data)
     # print 'args_flows_data: %s' % args_flows_data
     flow_data_list = args_flows_data.split(',')
@@ -262,12 +264,13 @@ def get_flow_data_list(args_flows_data, default_flow_data):
     flow_data_list = filter(valid_flow_data, flow_data_list)
     if len(flow_data_list) == 0:
         # print 'No valid flow data list, default flow data list will be used...'
-        logger.warn('No valid flow data list, default flow data list will be used...')
+        logger.warn(prefix_logger + 'No valid flow data list, default flow data list will be used...')
         # print "Default flow data: %s" % (default_flow_data)
-        logger.info('Default flow data: %s' % (default_flow_data))
+        logger.info(prefix_logger + 'Default flow data: %s' % (default_flow_data))
         flow_data_list.append(default_flow_data)
     # print 'flow_data_list before return:', flow_data_list
-    logger.debug('flow_data_list before return: %s' % flow_data_list)
+    logger.debug(prefix_logger + 'flow_data_list before return: %s' % flow_data_list)
+    logger.debug(prefix_logger + '...')
     return flow_data_list
 
 
