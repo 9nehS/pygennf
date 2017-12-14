@@ -20,6 +20,7 @@ import argparse
 import json
 import signal
 import threading
+from datetime import datetime
 
 from flask import Flask, jsonify, request, abort
 from scapy.all import *
@@ -54,7 +55,10 @@ def help():
 
 @app.route('/pygennf/tasks/status', methods=['GET'])
 def status():
-    status_info = json.dumps(threads_dict)
+    status_info_dict = {}
+    for k, v in threads_dict.items():
+        status_info_dict[k] = [v[0], v[1].__repr__()]
+    status_info = json.dumps(status_info_dict)
     return jsonify(status_info)
 
 
@@ -92,7 +96,7 @@ def create():
                                                                         flow_data_list, pkt_count, time_interval))
     # t.do_run = True
     # t.setDaemon(True)
-    threads_dict[str(get_uuid())] = [time.time(), t]
+    threads_dict[str(get_uuid())] = [datetime.now().isoformat(), t]
     logger.debug(prefix_logger + 'threads_dict: %s' % threads_dict)
     t.start()
     return jsonify(
