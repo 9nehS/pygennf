@@ -56,7 +56,7 @@ def help():
 def status():
     status_info_dict = {}
     for k, v in threads_dict.items():
-        status_info_dict[k] = [v[0], v[1].__repr__()]
+        status_info_dict[k] = [v['start_time'], v['thread'].__repr__()]
     # status_info = json.dumps(status_info_dict)
     return jsonify(status_info_dict)
 
@@ -98,7 +98,7 @@ def create():
     # t.do_run = True
     # t.setDaemon(True)
 
-    threads_dict[task_uuid] = [datetime.now().isoformat(), t]
+    threads_dict[task_uuid] = {"start_time": datetime.now().isoformat(), "thread": t}
     logger.debug(prefix_logger + 'threads_dict: %s' % threads_dict)
     t.start()
     return jsonify(
