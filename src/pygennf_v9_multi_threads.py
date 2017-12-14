@@ -47,7 +47,8 @@ def help():
     return jsonify(
         # 'API (application/json)': 'PATH, notes ?org-id=<orgId> currently required',
         {'Create sending task': '/pygennf/tasks/create',
-         'Check tasks status': '/pygennf/tasks/status'
+         'Check tasks status': '/pygennf/tasks/status',
+         'Print help info': '/pygennf/help'
          })
 
 
@@ -94,12 +95,14 @@ def create():
                                                                         flow_data_list, pkt_count, time_interval))
     # t.do_run = True
     # t.setDaemon(True)
-    threads_dict[str(get_uuid())] = [datetime.now().isoformat(), t]
+    task_uuid = get_uuid()
+    threads_dict[task_uuid] = [datetime.now().isoformat(), t]
     logger.debug(prefix_logger + 'threads_dict: %s' % threads_dict)
     t.start()
     return jsonify(
-        {'Status': 'Sending task created successfully',
-         'TaskName': 'This is task name'
+        {'status': 'Sending task created and started successfully',
+         'task_uuid': task_uuid,
+         'task_info': t.__repr__()
          })
     # while True:
     #     t.join(5)
