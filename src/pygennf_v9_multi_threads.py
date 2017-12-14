@@ -24,7 +24,7 @@ from flask import Flask, jsonify, request, abort
 from scapy.all import *
 
 import rb_netflow.rb_netflow as rbnf
-from utils.logger import get_logger, set_logger_level
+from utils.logger_util import get_logger, set_logger_level
 
 SIGNAL_RECEIVED = 0
 DIC_PROTOCOL_NUM = {'tcp': 6, 'udp': 17}
