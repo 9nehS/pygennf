@@ -8,7 +8,7 @@ LOGGER_LEVEL_MAP = {'info': logging.INFO, 'debug': logging.DEBUG}
 
 def get_logger(logger_name, logger_level=DEFAULT_LOGGER_LEVEL, logger_stream=sys.stdout):
     logger = logging.getLogger(logger_name)
-    logger.basicConfig(format=DEFAULT_LOG_FORMAT, stream=logger_stream)
+    logging.basicConfig(format=DEFAULT_LOG_FORMAT, stream=logger_stream)
     logger.setLevel(logger_level or DEFAULT_LOGGER_LEVEL)
     return logger
 
