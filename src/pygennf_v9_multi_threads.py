@@ -35,6 +35,8 @@ DIC_DIRECTION_NUM = {'ingress': 0, 'egress': 1}
 # e.g. 11.11.11.11/32:1001:11.11.11.22/32:1002:tcp:ingress:1024
 FLOW_DATA_PATTERN = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}:\d{1,5}:){2}\w+:(ingress|egress):\d{1,4}$'
 DEFAULT_FLOW_DATA = '11.11.11.11/32:1001:11.11.11.22/32:80:tcp:ingress:1024'
+DEFAULT_APP_HOST = '0.0.0.0'
+DEFAULT_APP_PORT = 15000
 
 
 app = Flask(__name__)
@@ -150,7 +152,7 @@ def get_parser():
     parser.add_argument('-fd', '--flows-data', dest='flows_data',
                         help='Contents in flows data, e.g. ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes.')
     parser.add_argument('-r', '--remote', dest='remote', action="store_true",
-                        help='Listen on TCP port 9080 as API server. All other parameters will be ignored.')
+                        help='Listen on TCP port 15000 as API server. All other parameters will be ignored.')
     parser.add_argument('-ll', '--log-level', dest='log_level', type=str, choices=['info', 'debug'],
                         help='Log level, default log level is info')
     return parser.parse_args()
@@ -183,7 +185,8 @@ def main():
 
     if args.remote:
         # api.start()
-        app.run(host='0.0.0.0', port=9080)
+        logger.info("Flow Generator starting to listen on '%s':'%s'" % (DEFAULT_APP_HOST, str(DEFAULT_APP_PORT)))
+        app.run(host=DEFAULT_APP_HOST, port=DEFAULT_APP_PORT)
         sys.exit(0)
 
     if args.src_ip:
@@ -326,7 +329,7 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip='2.2
         pkt_netflow_tmpl = gen_pkt_netflow_tmpl(timestamp=timestamp, flow_sequence=flow_sequence,
                                                 src_ip=src_ip, dst_ip =dst_ip, sport=sport, dport=dport)
         #wrpcap('v9_test_tmpl.pcap', pkt_netflow_tmpl)
-        sys.stdout.write("Sending packets: %d \r" % (flow_sequence))
+        sys.stdout.write("Sending packets: %d \r" % flow_sequence)
         send(pkt_netflow_tmpl, verbose=0)
         sys.stdout.flush()
     elif pkt_type == 'data':
@@ -335,7 +338,7 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip='2.2
                                                 src_ip=src_ip, dst_ip=dst_ip, sport=sport, dport=dport,
                                                 flow_data_list=flow_data_list)
         #wrpcap('v9_test_data.pcap', pkt_netflow_data)
-        sys.stdout.write("Sending packets: %d \r" % (flow_sequence))
+        sys.stdout.write("Sending packets: %d \r" % flow_sequence)
         send(pkt_netflow_data, verbose=0)
         sys.stdout.flush()
 
