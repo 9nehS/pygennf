@@ -95,7 +95,7 @@ def create():
 
     task_uuid = get_uuid()
     t = threading.Thread(target=start_send, name=task_uuid, args=(ip_src, ip_dst, port_src, port_dst,
-                                                                        flow_data_list, pkt_count, time_interval))
+                                                                  flow_data_list, pkt_count, time_interval, True))
     # t.do_run = True
     # t.setDaemon(True)
 
@@ -288,11 +288,12 @@ def get_flow_data_list(args_flows_data, default_flow_data):
     return flow_data_list
 
 
-
-def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, time_interval):
-    print 'Thread %s is running...' % threading.current_thread().name
+def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, time_interval, remote=False):
+    current_thread_name = threading.current_thread().name
+    print 'Thread %s is running...' % current_thread_name
     flow_sequence = 1
-    gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src, dport=port_dst)
+    gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src, dport=port_dst,
+                 remote=remote)
     print 'Flows to be sent: '
     print flow_data_list
     while time_interval is not 0:
@@ -308,17 +309,18 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
             #sys.exit(0)
             break
         if flow_sequence % 100 == 0:
-            gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst,
-                         sport=port_src, dport=port_dst)
+            gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src,
+                         dport=port_dst, remote=remote)
             continue
         gen_send_pkt('data', flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src, dport=port_dst,
-                     flow_data_list=flow_data_list)
+                     flow_data_list=flow_data_list, remote=remote)
 
     print 'Thread %s ended.' % threading.current_thread().name
 
 
-def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2.2.2.2', sport=2056, dport=2055,
-                 flow_data_list=[]):
+def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip='2.2.2.2', sport=2056, dport=2055,
+                 flow_data_list=[], remote=False):
+    current_thread_name = threading.current_thread().name
     timestamp = int(time.time())
     if pkt_type == 'tmpl':
         pkt_netflow_tmpl = gen_pkt_netflow_tmpl(timestamp=timestamp, flow_sequence=flow_sequence,
@@ -336,6 +338,12 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip = '2
         sys.stdout.write("Sending packets: %d \r" % (flow_sequence))
         send(pkt_netflow_data, verbose=0)
         sys.stdout.flush()
+
+    if remote:
+        try:
+            threads_dict[current_thread_name]['pkt_sent'] = flow_sequence
+        except KeyError:
+            logger.warn("pkt_sent cannot be assigned to thread '%s' in thread_dict" % current_thread_name)
 
 
 def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=3600000, src_ip='121.41.5.67',
