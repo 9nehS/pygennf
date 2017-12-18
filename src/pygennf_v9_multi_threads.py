@@ -321,7 +321,10 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
     print 'Thread %s ended.' % threading.current_thread().name
     if remote:
         try:
-            threads_dict[current_thread_name]['end_time'] = datetime.now().isoformat()
+            current_time = datetime.now().isoformat()
+            threads_dict[current_thread_name]['end_time'] = current_time
+            logger.debug(
+                "current_time '%s' has been set to threads_dict for thread '%s'" % (current_time, current_thread_name))
         except KeyError:
             logger.warn("end_time set failed in threads_dict")
 
