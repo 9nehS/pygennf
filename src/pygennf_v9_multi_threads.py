@@ -58,7 +58,8 @@ def help():
 def status():
     status_info_dict = {}
     for k, v in threads_dict.items():
-        status_info_dict[k] = {'start_time': v['start_time'], 'task_info': v['thread'].__repr__(),
+        status_info_dict[k] = {'start_time': v['start_time'], 'end_time': v['end_time'],
+                               'task_info': v['thread'].__repr__(),
                                'pkt_sent': v['pkt_sent']}
     # status_info = json.dumps(status_info_dict)
     return jsonify(status_info_dict)
@@ -324,7 +325,7 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
             current_time = datetime.now().isoformat()
             threads_dict[current_thread_name]['end_time'] = current_time
             logger.debug(
-                "current_time '%s' has been set to threads_dict for thread '%s'" % (current_time, current_thread_name))
+                "end_time '%s' has been set to threads_dict for thread '%s'" % (current_time, current_thread_name))
         except KeyError:
             logger.warn("end_time set failed in threads_dict")
 
