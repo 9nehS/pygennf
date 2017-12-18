@@ -101,7 +101,7 @@ def create():
     # t.do_run = True
     # t.setDaemon(True)
 
-    threads_dict[task_uuid] = {"start_time": datetime.now().isoformat(), "thread": t, "pkt_sent": 0}
+    threads_dict[task_uuid] = {"start_time": datetime.now().isoformat(), "end_time": "", "thread": t, "pkt_sent": 0}
     logger.debug(prefix_logger + 'threads_dict: %s' % threads_dict)
     t.start()
     return jsonify(
@@ -319,6 +319,11 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
                      flow_data_list=flow_data_list, remote=remote)
 
     print 'Thread %s ended.' % threading.current_thread().name
+    if remote:
+        try:
+            threads_dict[current_thread_name]['end_time'] = datetime.now().isoformat()
+        except KeyError:
+            logger.warn("end_time set failed in threads_dict")
 
 
 def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip='2.2.2.2', sport=2056, dport=2055,
