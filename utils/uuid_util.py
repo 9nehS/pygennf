@@ -2,4 +2,4 @@ import uuid
 
 
 def get_uuid():
-    return str(uuid.uuid1())
+    return str(uuid.uuid4())
