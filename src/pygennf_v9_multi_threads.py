@@ -87,9 +87,9 @@ def status_specific(task_id):
         return jsonify(status_info_dict)
 
 
-# Kill the specific thread
-@app.route('/pygennf/tasks/kill/<task_id>', methods=['GET'])
-def kill_specific(task_id):
+# Stop the specific thread
+@app.route('/pygennf/tasks/stop/<task_id>', methods=['GET'])
+def stop_specific(task_id):
     if task_id not in threads_dict:
         return jsonify(
             {'status': 'Error',
@@ -101,7 +101,7 @@ def kill_specific(task_id):
         if threads_dict[task_id]['status'] in ('completed', 'user stopped'):
             return jsonify(
                 {'status': 'Success',
-                 'desc': 'The task with this task_id is already completed, no need to be killed',
+                 'desc': 'The task with this task_id is already completed, no need to be stopped',
                  'task_uuid': task_id,
                  'task_info': ''
                  })
@@ -119,10 +119,26 @@ def kill_specific(task_id):
             else:
                 return jsonify(
                     {'status': 'Success',
-                     'desc': 'The task with this task_id is already completed, no need to be killed',
+                     'desc': 'The task with this task_id is already completed, no need to be stopped',
                      'task_uuid': task_id,
                      'task_info': ''
                      })
+
+
+# Stop all the running threads
+@app.route('/pygennf/tasks/stop', methods=['GET'])
+def stop_all():
+    thread_name_list = []
+    for task_id in threads_dict.keys():
+        threads_dict[task_id]['stop_flag'] = 'true'
+        thread_name_list.append(task_id)
+
+    return jsonify(
+        {'status': 'Success',
+         'desc': 'The stop_flag for all the tasks have been set, those tasks will be completed soon',
+         'task_uuid': thread_name_list,
+         'task_info': ''
+         })
 
 
 
