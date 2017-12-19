@@ -77,7 +77,12 @@ def status_specific(task_id):
              'task_info': ''
              })
     else:
-        logger.debug("Task_id '%s' was found in task list" % task_id)
+        status_info_dict = {}
+        status_info_dict[task_id] = {'start_time': threads_dict[task_id]['start_time'],
+                                     'end_time': threads_dict[task_id]['end_time'],
+                                     'task_info': threads_dict[task_id]['thread'].__repr__(),
+                                     'pkt_sent': threads_dict[task_id]['pkt_sent']}
+        return jsonify(status_info_dict)
 
 
 # Create the thread to send packets
