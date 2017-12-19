@@ -54,8 +54,9 @@ def help():
          })
 
 
+# Get the status of all threads
 @app.route('/pygennf/tasks/status', methods=['GET'])
-def status():
+def status_all():
     status_info_dict = {}
     for k, v in threads_dict.items():
         status_info_dict[k] = {'start_time': v['start_time'], 'end_time': v['end_time'],
@@ -65,11 +66,25 @@ def status():
     return jsonify(status_info_dict)
 
 
+# Get the status of specific thread
+@app.route('/pygennf/tasks/status/<task_id>', methods=['GET'])
+def status_specific(task_id):
+    if task_id not in threads_dict:
+        return jsonify(
+            {'status': 'Error',
+             'desc': 'The task_id cannot be found in task list',
+             'task_uuid': task_id,
+             'task_info': ''
+             })
+
+
+# Create the thread to send packets
 @app.route('/pygennf/tasks/create', methods=['POST'])
 def create():
     prefix_logger = '[Method][create]'
     # print "create() invoked..."
     if not request.json:
+        logger.debug(prefix_logger + "Json body is expected in POST message!!")
         abort(404)
     # print request.json
     ip_src = request.json['ip_src'].encode("ascii")
@@ -106,7 +121,8 @@ def create():
     logger.debug(prefix_logger + 'threads_dict: %s' % threads_dict)
     t.start()
     return jsonify(
-        {'status': 'Sending task created and started successfully',
+        {'status': 'Success',
+         'desc': 'Packets sending task created and started successfully',
          'task_uuid': task_uuid,
          'task_info': t.__repr__()
          })
@@ -127,9 +143,7 @@ def signal_handler(signal, frame):
 def valid_flow_data(flow_data_str=''):
     global FLOW_DATA_PATTERN
     m = re.match(FLOW_DATA_PATTERN, flow_data_str)
-    if m is not None:
-        return True
-    return False
+    return True if m is not None else False
 
 
 def get_parser():
@@ -185,7 +199,6 @@ def main():
         set_logger_level(logger, args.log_level)
 
     if args.remote:
-        # api.start()
         logger.info("Flow Generator starting to listen on '%s':'%s'" % (DEFAULT_APP_HOST, str(DEFAULT_APP_PORT)))
         app.run(host=DEFAULT_APP_HOST, port=DEFAULT_APP_PORT)
         sys.exit(0)
@@ -255,8 +268,6 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    #start_send(IP_SRC, IP_DST, PORT_SRC, PORT_DST, FLOW_DATA_LIST, PKT_COUNT, TIME_INTERVAL)
-
     print 'Thread %s is running...' % threading.current_thread().name
     t = threading.Thread(target=start_send, name='SendingThread', args=(ip_src, ip_dst, port_src, port_dst,
                                                                         flow_data_list, pkt_count, time_interval))
@@ -282,7 +293,7 @@ def get_flow_data_list(args_flows_data, default_flow_data):
     flow_data_list = filter(valid_flow_data, flow_data_list)
     if len(flow_data_list) == 0:
         # print 'No valid flow data list, default flow data list will be used...'
-        logger.warn(prefix_logger + 'No valid flow data list, default flow data list will be used...')
+        logger.info(prefix_logger + 'No valid flow data list, default flow data list will be used...')
         # print "Default flow data: %s" % (default_flow_data)
         logger.info(prefix_logger + 'Default flow data: %s' % (default_flow_data))
         flow_data_list.append(default_flow_data)
@@ -327,7 +338,7 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
             logger.debug(
                 "end_time '%s' has been set to threads_dict for thread '%s'" % (current_time, current_thread_name))
         except KeyError:
-            logger.warn("end_time set failed in threads_dict")
+            logger.info("end_time set failed in threads_dict")
 
 
 def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip='2.2.2.2', sport=2056, dport=2055,
@@ -355,7 +366,7 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip='2.2
         try:
             threads_dict[current_thread_name]['pkt_sent'] = flow_sequence
         except KeyError:
-            logger.warn("pkt_sent cannot be assigned to thread '%s' in thread_dict" % current_thread_name)
+            logger.info("pkt_sent cannot be assigned to thread '%s' in thread_dict" % current_thread_name)
 
 
 def gen_pkt_netflow_data(timestamp=1503652676, flow_sequence=1, sys_uptime=3600000, src_ip='121.41.5.67',
