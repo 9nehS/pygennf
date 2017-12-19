@@ -61,7 +61,8 @@ def status_all():
     for k, v in threads_dict.items():
         status_info_dict[k] = {'start_time': v['start_time'], 'end_time': v['end_time'],
                                'task_info': v['thread'].__repr__(),
-                               'pkt_sent': v['pkt_sent']}
+                               'pkt_sent': v['pkt_sent'],
+                               'status': v['status']}
     # status_info = json.dumps(status_info_dict)
     return jsonify(status_info_dict)
 
@@ -81,7 +82,8 @@ def status_specific(task_id):
         status_info_dict[task_id] = {'start_time': threads_dict[task_id]['start_time'],
                                      'end_time': threads_dict[task_id]['end_time'],
                                      'task_info': threads_dict[task_id]['thread'].__repr__(),
-                                     'pkt_sent': threads_dict[task_id]['pkt_sent']}
+                                     'pkt_sent': threads_dict[task_id]['pkt_sent'],
+                                     'status': threads_dict[task_id]['status']}
         return jsonify(status_info_dict)
 
 
