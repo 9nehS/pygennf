@@ -76,6 +76,8 @@ def status_specific(task_id):
              'task_uuid': task_id,
              'task_info': ''
              })
+    else:
+        logger.debug("Task_id '%s' was found in task list" % task_id)
 
 
 # Create the thread to send packets
