@@ -87,6 +87,45 @@ def status_specific(task_id):
         return jsonify(status_info_dict)
 
 
+# Kill the specific thread
+@app.route('/pygennf/tasks/kill/<task_id>', methods=['GET'])
+def kill_specific(task_id):
+    if task_id not in threads_dict:
+        return jsonify(
+            {'status': 'Error',
+             'desc': 'The task_id cannot be found in task list',
+             'task_uuid': task_id,
+             'task_info': ''
+             })
+    else:
+        if 'completed' == threads_dict[task_id]['status']:
+            return jsonify(
+                {'status': 'Success',
+                 'desc': 'The task with this task_id is already completed, no need to be killed',
+                 'task_uuid': task_id,
+                 'task_info': ''
+                 })
+        else:
+            logger.debug("Task with task_id '%s' is running now, will be stopped" % task_id)
+            task_thread = threads_dict[task_id]['thread']
+            if task_thread.isAlive():
+                threads_dict[task_id]['stop_flag'] = 'true'
+                return jsonify(
+                    {'status': 'Success',
+                     'desc': 'The stop_flag for this task_id is set, it will be completed soon',
+                     'task_uuid': task_id,
+                     'task_info': ''
+                     })
+            else:
+                return jsonify(
+                    {'status': 'Success',
+                     'desc': 'The task with this task_id is already completed, no need to be killed',
+                     'task_uuid': task_id,
+                     'task_info': ''
+                     })
+
+
+
 # Create the thread to send packets
 @app.route('/pygennf/tasks/create', methods=['POST'])
 def create():
@@ -298,6 +337,14 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
             break
         time.sleep(float(time_interval))
 
+        if remote:
+            try:
+                if 'true' == threads_dict[current_thread_name]['stop_flag']:
+                    logger.info("Detected stop_flag for task '%s', task will be completed" % current_thread_name)
+                    break
+            except KeyError:
+                pass
+
         flow_sequence = flow_sequence + 1
         if flow_sequence > pkt_count:
             print "\nPackets count[%s] reached. Stopping and Exiting..." % pkt_count
@@ -312,14 +359,18 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
 
     print 'Thread %s ended.' % threading.current_thread().name
     if remote:
+        current_time = datetime.now().isoformat()
+        threads_dict[current_thread_name]['end_time'] = current_time
+        logger.debug(
+            "end_time '%s' has been set to threads_dict for thread '%s'" % (current_time, current_thread_name))
+
         try:
-            current_time = datetime.now().isoformat()
-            threads_dict[current_thread_name]['end_time'] = current_time
-            logger.debug(
-                "end_time '%s' has been set to threads_dict for thread '%s'" % (current_time, current_thread_name))
-            threads_dict[current_thread_name]['status'] = "completed"
+            if 'true' == threads_dict[current_thread_name]['stop_flag']:
+                threads_dict[current_thread_name]['status'] = "user stopped"
+            else:
+                threads_dict[current_thread_name]['status'] = "completed"
         except KeyError:
-            logger.info("end_time set failed in threads_dict")
+            threads_dict[current_thread_name]['status'] = "completed"
 
 
 def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip='2.2.2.2', sport=2056, dport=2055,
