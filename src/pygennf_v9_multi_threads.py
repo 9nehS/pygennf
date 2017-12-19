@@ -124,21 +124,18 @@ def create():
     # t.do_run = True
     # t.setDaemon(True)
 
-    threads_dict[task_uuid] = {"start_time": datetime.now().isoformat(), "end_time": "", "thread": t, "pkt_sent": 0}
+    threads_dict[task_uuid] = {"start_time": "", "end_time": "", "thread": t, "pkt_sent": 0, "status": "not started"}
     logger.debug(prefix_logger + 'threads_dict: %s' % threads_dict)
     t.start()
+    threads_dict[task_uuid]['start_time'] = datetime.now().isoformat()
+    threads_dict[task_uuid]['status'] = 'started'
+
     return jsonify(
         {'status': 'Success',
          'desc': 'Packets sending task created and started successfully',
          'task_uuid': task_uuid,
          'task_info': t.__repr__()
          })
-    # while True:
-    #     t.join(5)
-    #     if not t.isAlive():
-    #         break
-    #
-    # print 'Thread %s ended.' % threading.current_thread().name
 
 
 def signal_handler(signal, frame):
@@ -167,10 +164,6 @@ def get_parser():
                         help='Time interval to wait before sending each netflow packet.')
     parser.add_argument('-c', '--pkt-count', dest='pkt_count',
                         help='Packets count to be sent before this generator stopping.')
-    # parser.add_argument('-p', '--protocol', dest='protocol',
-    #                     help='Protocols included in netflow data part, e.g. tcp(6) or udp(17).')
-    # parser.add_argument('-b', '--bytes', dest='bytes',
-    #                     help='Bytes(octets) in single flow, e.g. 1024.')
     parser.add_argument('-fd', '--flows-data', dest='flows_data',
                         help='Contents in flows data, e.g. ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes.')
     parser.add_argument('-r', '--remote', dest='remote', action="store_true",
@@ -244,26 +237,6 @@ def main():
         # 0xFFFFFFFF - 1
         pkt_count = 4294967294
 
-    # if args.protocol:
-    #     try:
-    #         PROTOCOL_NUM = DIC_PROTOCOL_NUM[args.protocol]
-    #     except KeyError:
-    #         print "Protocol '%s' cannot be mapped to existing protocols, use TCP[6] as default" % (args.protocol)
-    #         PROTOCOL_NUM = 6
-    # else:
-    #     PROTOCOL_NUM = 6    # TCP by default
-    #
-    # if args.bytes:
-    #     try:
-    #         BYTES = int(args.bytes)
-    #         if BYTES < 1 or BYTES > 4096:
-    #             raise ValueError
-    #     except ValueError:
-    #         print "Bytes '%s' should be integer between 1 and 4096, use 1024 as default" % (args.bytes)
-    #         BYTES = 1024
-    # else:
-    #     BYTES = 1024
-
     if args.flows_data:
         flow_data_list = get_flow_data_list(args.flows_data, DEFAULT_FLOW_DATA)
     else:
@@ -291,10 +264,8 @@ def main():
 
 def get_flow_data_list(args_flows_data, default_flow_data):
     prefix_logger = '[Method][get_flow_data_list]'
-    # print 'get_flow_data_list() start...'
     logger.debug(prefix_logger + 'Entering...')
-    # print 'type(args_flows_data):', type(args_flows_data)
-    # print 'args_flows_data: %s' % args_flows_data
+
     flow_data_list = args_flows_data.split(',')
     flow_data_list = map(str.strip, flow_data_list)
     flow_data_list = filter(valid_flow_data, flow_data_list)
@@ -344,6 +315,7 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
             threads_dict[current_thread_name]['end_time'] = current_time
             logger.debug(
                 "end_time '%s' has been set to threads_dict for thread '%s'" % (current_time, current_thread_name))
+            threads_dict[current_thread_name]['status'] = "completed"
         except KeyError:
             logger.info("end_time set failed in threads_dict")
 
