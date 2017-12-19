@@ -98,7 +98,7 @@ def kill_specific(task_id):
              'task_info': ''
              })
     else:
-        if 'completed' == threads_dict[task_id]['status']:
+        if threads_dict[task_id]['status'] in ('completed', 'user stopped'):
             return jsonify(
                 {'status': 'Success',
                  'desc': 'The task with this task_id is already completed, no need to be killed',
@@ -106,7 +106,7 @@ def kill_specific(task_id):
                  'task_info': ''
                  })
         else:
-            logger.debug("Task with task_id '%s' is running now, will be stopped" % task_id)
+            logger.debug("Task with task_id '%s' will be stopped now" % task_id)
             task_thread = threads_dict[task_id]['thread']
             if task_thread.isAlive():
                 threads_dict[task_id]['stop_flag'] = 'true'
