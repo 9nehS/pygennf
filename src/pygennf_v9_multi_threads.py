@@ -167,6 +167,34 @@ def stop_all():
          })
 
 
+# Clear specific task
+@app.route('/pygennf/tasks/clear/<task_id>', methods=['GET'])
+def clear(task_id):
+    if task_id not in threads_dict:
+        return jsonify(
+            {'status': 'Error',
+             'desc': 'The task_id cannot be found in task list',
+             'task_uuid': task_id,
+             'task_info': ''
+             })
+    else:
+        if threads_dict[task_id]['status'] not in ('completed', 'user stopped'):
+            return jsonify(
+                {'status': 'Error',
+                 'desc': 'The task with this task_id is still running, it should be completed or stopped first',
+                 'task_uuid': task_id,
+                 'task_info': ''
+                 })
+        else:
+            logger.debug("Task with task_id '%s' will be cleared from threads_dict now" % task_id)
+            del threads_dict[task_id]
+            return jsonify(
+                {'status': 'Success',
+                 'desc': 'Task has been cleared',
+                 'task_uuid': task_id,
+                 'task_info': ''
+                 })
+
 
 # Create the thread to send packets
 @app.route('/pygennf/tasks/create', methods=['POST'])
