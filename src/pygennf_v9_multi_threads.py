@@ -97,6 +97,22 @@ def detail_all():
     return jsonify(detail_info_dict)
 
 
+# Get the detail of specific thread
+@app.route('/pygennf/tasks/detail/<task_id>', methods=['GET'])
+def detail_specific(task_id):
+    if task_id not in threads_dict:
+        return jsonify(
+            {'status': 'Error',
+             'desc': 'The task_id cannot be found in task list',
+             'task_uuid': task_id,
+             'task_info': ''
+             })
+    else:
+        detail_info_dict = {}
+        detail_info_dict[task_id] = {'task_detail': threads_dict[task_id]['task_detail']}
+        return jsonify(detail_info_dict)
+
+
 # Stop the specific thread
 @app.route('/pygennf/tasks/stop/<task_id>', methods=['GET'])
 def stop_specific(task_id):
