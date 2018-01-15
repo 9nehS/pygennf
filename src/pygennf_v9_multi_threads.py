@@ -87,6 +87,16 @@ def status_specific(task_id):
         return jsonify(status_info_dict)
 
 
+# Get the detail of all threads
+@app.route('/pygennf/tasks/detail', methods=['GET'])
+def detail_all():
+    detail_info_dict = {}
+    for k, v in threads_dict.items():
+        detail_info_dict[k] = {'task_detail': v['task_detail']}
+
+    return jsonify(detail_info_dict)
+
+
 # Stop the specific thread
 @app.route('/pygennf/tasks/stop/<task_id>', methods=['GET'])
 def stop_specific(task_id):
@@ -181,7 +191,11 @@ def create():
     # t.do_run = True
     # t.setDaemon(True)
 
-    threads_dict[task_uuid] = {"start_time": "", "end_time": "", "thread": t, "pkt_sent": 0, "status": "not started"}
+    threads_dict[task_uuid] = {"start_time": "", "end_time": "", "thread": t, "pkt_sent": 0, "status": "not started",
+                               "task_detail": {"ip_src": ip_src, "ip_dst": ip_dst, "port_src": port_src,
+                                               "port_dst": port_dst, "flow_data_list": flow_data_list,
+                                               "pkt_count": pkt_count, "time_interval": time_interval}
+                               }
     logger.debug(prefix_logger + 'threads_dict: %s' % threads_dict)
     t.start()
     threads_dict[task_uuid]['start_time'] = datetime.now().isoformat()
