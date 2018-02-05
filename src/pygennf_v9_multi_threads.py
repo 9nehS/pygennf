@@ -396,12 +396,12 @@ def get_flow_data_list(args_flows_data, default_flow_data):
     return flow_data_list
 
 
-def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, time_interval, remote=False):
+def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, time_interval, is_remote=False):
     current_thread_name = threading.current_thread().name
     print 'Thread %s is running...' % current_thread_name
     flow_sequence = 1
     gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src, dport=port_dst,
-                 remote=remote)
+                 is_remote=is_remote)
     print 'Flows to be sent: '
     print flow_data_list
     while time_interval is not 0:
@@ -411,7 +411,7 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
             break
         time.sleep(float(time_interval))
 
-        if remote:
+        if is_remote:
             try:
                 if 'true' == threads_dict[current_thread_name]['stop_flag']:
                     logger.info("Detected stop_flag for task '%s', task will be completed" % current_thread_name)
@@ -426,13 +426,13 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
             break
         if flow_sequence % 100 == 0:
             gen_send_pkt('tmpl', flow_sequence=flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src,
-                         dport=port_dst, remote=remote)
+                         dport=port_dst, is_remote=is_remote)
             continue
         gen_send_pkt('data', flow_sequence, src_ip=ip_src, dst_ip=ip_dst, sport=port_src, dport=port_dst,
-                     flow_data_list=flow_data_list, remote=remote)
+                     flow_data_list=flow_data_list, is_remote=is_remote)
 
     print 'Thread %s ended.' % threading.current_thread().name
-    if remote:
+    if is_remote:
         current_time = datetime.now().isoformat()
         threads_dict[current_thread_name]['end_time'] = current_time
         logger.debug(
@@ -448,7 +448,7 @@ def start_send(ip_src, ip_dst, port_src, port_dst, flow_data_list, pkt_count, ti
 
 
 def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip='2.2.2.2', sport=2056, dport=2055,
-                 flow_data_list=[], remote=False):
+                 flow_data_list=[], is_remote=False):
     current_thread_name = threading.current_thread().name
     timestamp = int(time.time())
     if pkt_type == 'tmpl':
@@ -468,7 +468,7 @@ def gen_send_pkt(pkt_type='data', flow_sequence=1, src_ip='1.1.1.1', dst_ip='2.2
         send(pkt_netflow_data, verbose=0)
         sys.stdout.flush()
 
-    if remote:
+    if is_remote:
         try:
             threads_dict[current_thread_name]['pkt_sent'] = flow_sequence
         except KeyError:
