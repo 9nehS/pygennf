@@ -5,7 +5,9 @@ Netflow packets generator with Scapy library
 * How to install:
 > git clone https://github.com/9nehS/pygennf.git
 >
-> python setup.py install
+> git checkout dev_multi_threads
+>
+> python setup.py install --force
 
 # Usage:
 
