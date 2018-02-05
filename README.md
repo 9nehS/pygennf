@@ -11,9 +11,9 @@ Netflow packets generator with Scapy library
 
 # Usage:
 
- * pygennf_v9_multi_threads.py --help
+ * pygennf_v9_dev.py --help
 
->usage: pygennf_v9_multi_threads.py [-h] [-s SRC_IP] [-sp SRC_PORT] [-d DST_IP]
+>usage: pygennf_v9_dev.py [-h] [-s SRC_IP] [-sp SRC_PORT] [-d DST_IP]
 >                     [-dp DST_PORT] [-t TIME_INTERVAL]
 >                     [-c PKT_COUNT] [-fd FLOWS_DATA] [-r]
 >                     [-ll {info,debug}]
@@ -56,7 +56,7 @@ Netflow packets generator with Scapy library
 # Example of use:
 
  * Netflow 9 (CLI):
-> pygennf_v9_multi_threads.py --source-ip 10.9.255.54 --dst-ip 10.9.255.118 --dst-port 2062 -t 1 -c 3600 -fd '69.31.102.10/32:12345:209.81.108.20/32:80:tcp:ingress:1024, 70.32.103.11/32:54321:210.81.108.21/32:21:udp:ingress:1024'
+> pygennf_v9_dev.py --source-ip 10.9.255.54 --dst-ip 10.9.255.118 --dst-port 2062 -t 1 -c 3600 -fd '69.31.102.10/32:12345:209.81.108.20/32:80:tcp:ingress:1024, 70.32.103.11/32:54321:210.81.108.21/32:21:udp:ingress:1024'
 >
 > ![2017-09-30_console_snapshot_01.png](https://github.com/9nehS/pygennf/blob/master/resources/2017-09-30_console_snapshot_01.png)
 >
