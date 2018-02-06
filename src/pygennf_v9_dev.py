@@ -47,9 +47,11 @@ threads_dict = collections.OrderedDict()
 @app.route('/pygennf/help')
 def help():
     return jsonify(
-        # 'API (application/json)': 'PATH, notes ?org-id=<orgId> currently required',
         {'Create sending task': '/pygennf/tasks/create',
          'Check tasks status': '/pygennf/tasks/status',
+         'List tasks details': '/pygennf/tasks/detail',
+         'Stop the running tasks': '/pygennf/tasks/stop',
+         'Clear tasks': '/pygennf/tasks/clear',
          'Print help info': '/pygennf/help'
          })
 
