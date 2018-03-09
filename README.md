@@ -5,15 +5,18 @@ Netflow packets generator with Scapy library
 * How to install:
 > git clone https://github.com/9nehS/pygennf.git
 >
-> python setup.py install
+> git checkout dev_multi_threads
+>
+> python setup.py install --force
 
 # Usage:
 
- * pygennf_v9.py --help
+ * pygennf_v9_dev.py --help
 
->usage: pygennf_v9.py [-h] [-s SRC_IP] [-sp SRC_PORT] [-d DST_IP]
->                     [-dp DST_PORT] [-t TIME_INTERVAL] [-c PKT_COUNT]
->                     [-fd FLOWS_DATA]
+>usage: pygennf_v9_dev.py [-h] [-s SRC_IP] [-sp SRC_PORT] [-d DST_IP]
+>                     [-dp DST_PORT] [-t TIME_INTERVAL]
+>                     [-c PKT_COUNT] [-fd FLOWS_DATA] [-r]
+>                     [-ll {info,debug}]
 >
 >Netflow packets generator with scapy
 >
@@ -42,13 +45,21 @@ Netflow packets generator with Scapy library
 >  -fd FLOWS_DATA, --flows-data FLOWS_DATA
 >                       Contents in flows data, e.g. ip1/mask:port1:ip2/mask:port2:protocol:direction:bytes.
 >
+>  -r, --remote
+>                       Listen on TCP port 15000 as API server. All other parameters will be ignored.
+>
+>  -ll {info,debug}, --log-level {info,debug}
+>                       Log level, default log level is info
+>
 
 
 # Example of use:
 
- * Netflow 9:
-> pygennf_v9.py --source-ip 10.9.255.54 --dst-ip 10.9.255.118 --dst-port 2062 -t 1 -c 3600 -fd '69.31.102.10/32:12345:209.81.108.20/32:80:tcp:ingress:1024, 70.32.103.11/32:54321:210.81.108.21/32:21:udp:ingress:1024'
+ * Netflow 9 (CLI):
+> pygennf_v9_dev.py --source-ip 10.9.255.54 --dst-ip 10.9.255.118 --dst-port 2062 -t 1 -c 3600 -fd '69.31.102.10/32:12345:209.81.108.20/32:80:tcp:ingress:1024, 70.32.103.11/32:54321:210.81.108.21/32:21:udp:ingress:1024'
 >
 > ![2017-09-30_console_snapshot_01.png](https://github.com/9nehS/pygennf/blob/master/resources/2017-09-30_console_snapshot_01.png)
 >
 > ![2017-09-28_web_snapshot_01.png](https://github.com/9nehS/pygennf/blob/master/resources/2017-09-28_web_snapshot_01.png)
+>
+ * Netflow 9 (WebService):

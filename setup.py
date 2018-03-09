@@ -7,9 +7,11 @@ setup(name="pygennf",
       author_email="sheng.zhao@calix.com",
       url="https://github.com/9nehS/",
       license="AGPL",
-      scripts=["src/pygennf_v9.py"],
-      packages=['rb_netflow'],
+      scripts=["src/pygennf_v9.py", "src/pygennf_v9_dev.py"],
+      packages=['rb_netflow', 'utils'],
+      # packages=find_packages(),
       install_requires=[
           'scapy',
+          'flask'
       ]
-) 
+      )
