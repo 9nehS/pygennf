@@ -63,3 +63,6 @@ Netflow packets generator with Scapy library
 > ![2017-09-28_web_snapshot_01.png](https://github.com/9nehS/pygennf/blob/master/resources/2017-09-28_web_snapshot_01.png)
 >
  * Netflow 9 (WebService):
+> pygennf_v9_dev.py --remote
+>
+> ![2018-05-11_remote.png](https://github.com/9nehS/pygennf/blob/master/resources/2018-05-11_remote.png)
